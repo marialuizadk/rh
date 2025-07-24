@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>RH Evoluído - Home</title>
 <style>
-  /* Reset */
+  /* Reset básico */
   * {
     margin: 0; padding: 0; box-sizing: border-box;
   }
@@ -25,7 +25,7 @@
     padding: 40px 50px;
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(214, 51, 108, 0.25);
-    max-width: 600px;
+    max-width: 400px;
     width: 90%;
     text-align: center;
   }
@@ -37,8 +37,7 @@
   }
   .btn-group {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column; /* vertical */
     gap: 20px;
   }
   .btn-group a {
@@ -48,19 +47,13 @@
     padding: 15px 30px;
     border-radius: 10px;
     font-weight: 600;
-    font-size: 1.1rem;
-    min-width: 180px;
+    font-size: 1.2rem;
     transition: background-color 0.3s ease;
   }
   .btn-group a:hover,
   .btn-group a:focus {
     background-color: #a02947;
     outline: none;
-  }
-  @media (max-width: 480px) {
-    .btn-group a {
-      min-width: 100%;
-    }
   }
 </style>
 </head>

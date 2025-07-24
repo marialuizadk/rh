@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RH Evoluído - Home</title>
+<style>
+  /* Reset */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  html, body {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: #fff0f6; /* rosa claro */
+    color: #4a2a4a;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(214, 51, 108, 0.25);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+  }
+  h1 {
+    color: #d6336c;
+    font-weight: bold;
+    font-size: 2.4rem;
+    margin-bottom: 40px;
+  }
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  .btn-group a {
+    text-decoration: none;
+    background-color: #d6336c;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    min-width: 180px;
+    transition: background-color 0.3s ease;
+  }
+  .btn-group a:hover,
+  .btn-group a:focus {
+    background-color: #a02947;
+    outline: none;
+  }
+  @media (max-width: 480px) {
+    .btn-group a {
+      min-width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bem-vindo ao RH Evoluído</h1>
+    <div class="btn-group">
+      <a href="cadastro.html">Cadastrar Funcionário</a>
+      <a href="ferias.html">Lançar Férias</a>
+      <a href="demissao.html">Registrar Demissão</a>
+      <a href="aviso.html">Aviso Prévio</a>
+      <a href="ativos.html">Funcionários Ativos</a>
+      <a href="inativos.html">Funcionários Inativos</a>
+      <a href="relatorio.html">Gerar Relatório</a>
+    </div>
+  </div>
+</body>
+</html>

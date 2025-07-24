@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relatório - RH Evoluído</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <nav class="menu">
+      <ul>
+        <li><a href="index.html">Início</a></li>
+        <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
+        <li><a href="ativos.html">Funcionários Ativos</a></li>
+        <li><a href="inativos.html">Funcionários Inativos</a></li>
+        <li><a href="ferias.html">Lançar Férias</a></li>
+        <li><a href="demissao.html">Registrar Demissão</a></li>
+        <li><a href="aviso.html">Aviso Prévio</a></li>
+        <li><a href="relatorio.html">Gerar Relatório</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="container">
+      <h1>Gerar Relatório</h1>
+
+      <form id="form-relatorio">
+        <label for="dataInicio">Data Início:</label>
+        <input type="date" id="dataInicio" required />
+
+        <label for="dataFim">Data Final:</label>
+        <input type="date" id="dataFim" required />
+
+        <button type="submit">Gerar Relatório</button>
+      </form>
+
+      <h2>Relatório</h2>
+      <pre id="relatorio-output" style="white-space: pre-wrap; background:#fff5f8; border: 1px solid #d6336c; border-radius: 10px; padding: 15px; max-height: 400px; overflow-y: auto;"></pre>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("form-relatorio");
+    const output = document.getElementById("relatorio-output");
+
+    function carregarTodosDados() {
+      return {
+        ativos: JSON.parse(localStorage.getItem("funcionariosAtivos") || "[]"),
+        inativos: JSON.parse(localStorage.getItem("funcionariosInativos") || "[]"),
+        ferias: JSON.parse(localStorage.getItem("ferias") || "[]"),
+        demissoes: JSON.parse(localStorage.getItem("demissoes") || "[]"),
+        avisos: JSON.parse(localStorage.getItem("avisos") || "[]")
+      };
+    }
+
+    function filtrarPorData(lista, dataInicio, dataFim, campo = "dataInicio") {
+      const dtInicio = new Date(dataInicio);
+      const dtFim = new Date(dataFim);
+      return lista.filter(item => {
+        const dtItem = new Date(item[campo]);
+        return dtItem >= dtInicio && dtItem <= dtFim;
+      });
+    }
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const dataInicio = form.dataInicio.value;
+      const dataFim = form.dataFim.value;
+
+      if (!dataInicio || !dataFim) {
+        alert("Preencha as datas corretamente.");
+        return;
+      }
+
+      if (new Date(dataInicio) > new Date(dataFim)) {
+        alert("Data início deve ser anterior ou igual à data final.");
+        return;
+      }
+
+      const dados = carregarTodosDados();
+
+      const ativosFiltrados = filtrarPorData(dados.ativos, dataInicio, dataFim);
+      const inativosFiltrados = filtrarPorData(dados.inativos, dataInicio, dataFim);
+      const feriasFiltradas = filtrarPorData(dados.ferias, dataInicio, dataFim);
+      const demissoesFiltradas = filtrarPorData(dados.demissoes, dataInicio, dataFim);
+      const avisosFiltrados = filtrarPorData(dados.avisos, dataInicio, dataFim);
+
+      let texto = `Relatório de RH\nPeríodo: ${dataInicio} até ${dataFim}\n\n`;
+
+      texto += "Funcionários Ativos:\n";
+      ativosFiltrados.forEach(f => {
+        texto += `- ${f.nome} | CPF: ${f.cpf}\n`;
+      });
+      texto += "\nFuncionários Inativos:\n";
+      inativosFiltrados.forEach(f => {
+        texto += `- ${f.nome} | CPF: ${f.cpf}\n`;
+      });
+      texto += "\nFérias Registradas:\n";
+      feriasFiltradas.forEach(f => {
+        texto += `- ${f.nome} | CPF: ${f.cpf} | Local: ${f.local} | ${f.dataInicio} a ${f.dataFim}\n`;
+      });
+      texto += "\nDemissões Registradas:\n";
+      demissoesFiltradas.forEach(f => {
+        texto += `- ${f.nome} | CPF: ${f.cpf} | Data: ${f.data} | Motivo: ${f.motivo} | Local: ${f.local}\n`;
+      });
+      texto += "\nAvisos Prévios:\n";
+      avisosFiltrados.forEach(f => {
+        texto += `- ${f.nome} | CPF: ${f.cpf} | Local: ${f.local} | ${f.dataInicio} a ${f.dataFim}\n`;
+      });
+
+      output.textContent = texto || "Nenhum dado encontrado para o período informado.";
+    });
+  </script>
+</body>
+</html>

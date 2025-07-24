@@ -1,0 +1,215 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #fff0f6; /* rosa clarinho */
+  color: #4a2a4a; /* tom roxo escuro */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 70px; /* espaço para menu fixo */
+}
+
+/* Menu fixo no topo */
+header {
+  width: 100%;
+  background: #d6336c; /* rosa escuro */
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 3px 8px rgba(214, 51, 108, 0.5);
+}
+
+.menu ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  padding: 15px 0;
+  gap: 25px;
+}
+
+.menu ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.menu ul li a:hover,
+.menu ul li a:focus {
+  background-color: #a02947;
+  outline: none;
+}
+
+/* Container centralizado com fundo branco e borda arredondada */
+.container {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 15px;
+  max-width: 700px;
+  width: 90%;
+  box-shadow: 0 5px 20px rgba(214, 51, 108, 0.25);
+  margin-bottom: 50px;
+}
+
+/* Títulos */
+h1, h2 {
+  color: #d6336c;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Formulários */
+form label {
+  display: block;
+  margin: 15px 0 6px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+form input[type="text"],
+form input[type="date"],
+form select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 2px solid #d6336c;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+form input[type="text"]:focus,
+form input[type="date"]:focus,
+form select:focus {
+  border-color: #a02947;
+  outline: none;
+}
+
+form button {
+  margin-top: 25px;
+  background-color: #d6336c;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: block;
+  width: 100%;
+}
+
+form button:hover,
+form button:focus {
+  background-color: #a02947;
+  outline: none;
+}
+
+/* Listas de registros */
+ul#lista-demissoes,
+ul#lista-ferias,
+ul#lista-avisos,
+ul#lista-inativos,
+ul#lista-ativos {
+  list-style: none;
+  margin-top: 20px;
+  max-height: 350px;
+  overflow-y: auto;
+  border: 1px solid #d6336c;
+  border-radius: 10px;
+  padding: 15px;
+  background: #fff5f8;
+}
+
+ul#lista-demissoes li,
+ul#lista-ferias li,
+ul#lista-avisos li,
+ul#lista-inativos li,
+ul#lista-ativos li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #d6336c;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  color: #4a2a4a;
+}
+
+ul#lista-demissoes li:last-child,
+ul#lista-ferias li:last-child,
+ul#lista-avisos li:last-child,
+ul#lista-inativos li:last-child,
+ul#lista-ativos li:last-child {
+  border-bottom: none;
+}
+
+/* Botões dentro das listas */
+ul li button {
+  margin-left: 8px;
+  background-color: #d6336c;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+ul li button:hover,
+ul li button:focus {
+  background-color: #a02947;
+  outline: none;
+}
+
+/* Select ordenar */
+label[for="ordenar"] {
+  display: block;
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+select#ordenar {
+  margin-top: 6px;
+  width: 200px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 2px solid #d6336c;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+select#ordenar:focus {
+  border-color: #a02947;
+  outline: none;
+}
+
+/* Responsividade simples */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+    width: 95%;
+  }
+
+  .menu ul {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  form button {
+    font-size: 1rem;
+  }
+}

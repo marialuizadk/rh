@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aviso Prévio - RH Evoluído</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <nav class="menu">
+      <ul>
+        <li><a href="index.html">Início</a></li>
+        <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
+        <li><a href="ativos.html">Funcionários Ativos</a></li>
+        <li><a href="inativos.html">Funcionários Inativos</a></li>
+        <li><a href="ferias.html">Lançar Férias</a></li>
+        <li><a href="demissao.html">Registrar Demissão</a></li>
+        <li><a href="aviso.html">Aviso Prévio</a></li>
+        <li><a href="relatorio.html">Gerar Relatório</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="container">
+      <h1>Aviso Prévio</h1>
+
+      <form id="form-aviso">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" required />
+
+        <label for="cpf">CPF:</label>
+        <input type="text" id="cpf" required />
+
+        <label for="local">Local:</label>
+        <input type="text" id="local" required />
+
+        <label for="dataInicio">Data Início:</label>
+        <input type="date" id="dataInicio" required />
+
+        <label for="dataFim">Data Fim (reduzida 7 dias automaticamente):</label>
+        <input type="date" id="dataFim" readonly />
+
+        <button type="submit">Registrar Aviso Prévio</button>
+      </form>
+
+      <h2>Avisos Registrados</h2>
+
+      <label for="ordenar">Ordenar por:</label>
+      <select id="ordenar">
+        <option value="nome">Nome (A-Z)</option>
+        <option value="dataInicio">Data Início (mais recente)</option>
+      </select>
+
+      <ul id="lista-avisos"></ul>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("form-aviso");
+    const lista = document.getElementById("lista-avisos");
+    const ordenar = document.getElementById("ordenar");
+    const dataInicioInput = document.getElementById("dataInicio");
+    const dataFimInput = document.getElementById("dataFim");
+
+    // Atualiza dataFim reduzida 7 dias ao alterar dataInicio
+    dataInicioInput.addEventListener("change", () => {
+      if (!dataInicioInput.value) {
+        dataFimInput.value = "";
+        return;
+      }
+      const inicio = new Date(dataInicioInput.value);
+      const fim = new Date(inicio);
+      fim.setDate(fim.getDate() + 7); // aviso prévio usual é +7, mas se quiser redução, tire 7 aqui
+      // Mas pedido é reduzir 7 dias da data fim, então vamos mostrar data fim como dataInicio + X dias menos 7
+
+      // Se o usuário inserir dataInicio e quiser dataFim = dataInicio + N - 7 dias, 
+      // assumiremos período total de 30 dias, reduzindo 7 = 23 dias:
+      const fimReduzido = new Date(inicio);
+      fimReduzido.setDate(fimReduzido.getDate() + 23);
+
+      dataFimInput.value = fimReduzido.toISOString().slice(0, 10);
+    });
+
+    function carregarAvisos() {
+      return JSON.parse(localStorage.getItem("avisos") || "[]");
+    }
+
+    function salvarAvisos(avisos) {
+      localStorage.setItem("avisos", JSON.stringify(avisos));
+    }
+
+    function renderizar() {
+      let avisos = carregarAvisos();
+
+      if (ordenar.value === "nome") {
+        avisos.sort((a, b) => a.nome.localeCompare(b.nome));
+      } else {
+        avisos.sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
+      }
+
+      lista.innerHTML = "";
+
+      avisos.forEach((aviso, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${aviso.nome}</strong> - CPF: ${aviso.cpf} - Local: ${aviso.local} - Início: ${aviso.dataInicio} - Fim: ${aviso.dataFim}
+          <button onclick="editar(${i})">Editar</button>
+          <button onclick="excluir(${i})">Excluir</button>
+        `;
+        lista.appendChild(li);
+      });
+    }
+
+    function editar(index) {
+      let avisos = carregarAvisos();
+      const aviso = avisos[index];
+
+      const novoNome = prompt("Editar Nome:", aviso.nome);
+      if (novoNome === null || novoNome.trim() === "") return alert("Nome inválido");
+      const novoCpf = prompt("Editar CPF:", aviso.cpf);
+      if (novoCpf === null || novoCpf.trim() === "") return alert("CPF inválido");
+      const novoLocal = prompt("Editar Local:", aviso.local);
+      if (novoLocal === null || novoLocal.trim() === "") return alert("Local inválido");
+      const novaDataInicio = prompt("Editar Data Início (AAAA-MM-DD):", aviso.dataInicio);
+      if (novaDataInicio === null || isNaN(Date.parse(novaDataInicio))) return alert("Data inválida");
+      const novaDataFim = prompt("Editar Data Fim (AAAA-MM-DD):", aviso.dataFim);
+      if (novaDataFim === null || isNaN(Date.parse(novaDataFim))) return alert("Data inválida");
+
+      avisos[index] = {
+        nome: novoNome.trim(),
+        cpf: novoCpf.trim(),
+        local: novoLocal.trim(),
+        dataInicio: novaDataInicio.trim(),
+        dataFim: novaDataFim.trim()
+      };
+
+      salvarAvisos(avisos);
+      renderizar();
+    }
+
+    function excluir(index) {
+      if (!confirm("Deseja realmente excluir este registro?")) return;
+      let avisos = carregarAvisos();
+      avisos.splice(index, 1);
+      salvarAvisos(avisos);
+      renderizar();
+    }
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+
+      if (!form.nome.value.trim() || !form.cpf.value.trim() || !form.local.value.trim() || !form.dataInicio.value || !dataFimInput.value) {
+        alert("Preencha todos os campos.");
+        return;
+      }
+
+      const novoAviso = {
+        nome: form.nome.value.trim(),
+        cpf: form.cpf.value.trim(),
+        local: form.local.value.trim(),
+        dataInicio: form.dataInicio.value,
+        dataFim: dataFimInput.value
+      };
+
+      let avisos = carregarAvisos();
+      avisos.push(novoAviso);
+      salvarAvisos(avisos);
+
+      form.reset();
+      dataFimInput.value = "";
+      renderizar();
+    });
+
+    ordenar.addEventListener("change", renderizar);
+
+    renderizar();
+  </script>
+</body>
+</html>

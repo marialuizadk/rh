@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lançar Férias - RH Evoluído</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <nav class="menu">
+      <ul>
+        <li><a href="index.html">Início</a></li>
+        <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
+        <li><a href="ativos.html">Funcionários Ativos</a></li>
+        <li><a href="inativos.html">Funcionários Inativos</a></li>
+        <li><a href="ferias.html">Lançar Férias</a></li>
+        <li><a href="demissao.html">Registrar Demissão</a></li>
+        <li><a href="aviso.html">Aviso Prévio</a></li>
+        <li><a href="relatorio.html">Gerar Relatório</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="container">
+      <h1>Lançar Férias</h1>
+
+      <form id="form-ferias">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" required />
+
+        <label for="cpf">CPF:</label>
+        <input type="text" id="cpf" required />
+
+        <label for="local">Local:</label>
+        <input type="text" id="local" required />
+
+        <label for="dataInicio">Data Início:</label>
+        <input type="date" id="dataInicio" required />
+
+        <label for="dataFim">Data Fim:</label>
+        <input type="date" id="dataFim" required />
+
+        <button type="submit">Registrar Férias</button>
+      </form>
+
+      <h2>Férias Registradas</h2>
+      <label for="ordenar">Ordenar por:</label>
+      <select id="ordenar">
+        <option value="nome">Nome (A-Z)</option>
+        <option value="dataInicio">Data Início (mais recente)</option>
+      </select>
+
+      <ul id="lista-ferias"></ul>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("form-ferias");
+    const lista = document.getElementById("lista-ferias");
+    const ordenar = document.getElementById("ordenar");
+
+    function carregarFerias() {
+      return JSON.parse(localStorage.getItem("ferias") || "[]");
+    }
+
+    function salvarFerias(ferias) {
+      localStorage.setItem("ferias", JSON.stringify(ferias));
+    }
+
+    function renderizar() {
+      let ferias = carregarFerias();
+
+      if (ordenar.value === "nome") {
+        ferias.sort((a, b) => a.nome.localeCompare(b.nome));
+      } else {
+        ferias.sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
+      }
+
+      lista.innerHTML = "";
+
+      ferias.forEach((f, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${f.nome}</strong> - CPF: ${f.cpf} - Local: ${f.local} - Início: ${f.dataInicio} - Fim: ${f.dataFim}
+          <button onclick="editar(${i})">Editar</button>
+          <button onclick="excluir(${i})">Excluir</button>
+        `;
+        lista.appendChild(li);
+      });
+    }
+
+    function editar(index) {
+      let ferias = carregarFerias();
+      const f = ferias[index];
+
+      const novoNome = prompt("Editar Nome:", f.nome);
+      if (novoNome === null || novoNome.trim() === "") return alert("Nome inválido");
+      const novoCpf = prompt("Editar CPF:", f.cpf);
+      if (novoCpf === null || novoCpf.trim() === "") return alert("CPF inválido");
+      const novoLocal = prompt("Editar Local:", f.local);
+      if (novoLocal === null || novoLocal.trim() === "") return alert("Local inválido");
+      const novaDataInicio = prompt("Editar Data Início (AAAA-MM-DD):", f.dataInicio);
+      if (novaDataInicio === null || isNaN(Date.parse(novaDataInicio))) return alert("Data inválida");
+      const novaDataFim = prompt("Editar Data Fim (AAAA-MM-DD):", f.dataFim);
+      if (novaDataFim === null || isNaN(Date.parse(novaDataFim))) return alert("Data inválida");
+
+      ferias[index] = {
+        nome: novoNome.trim(),
+        cpf: novoCpf.trim(),
+        local: novoLocal.trim(),
+        dataInicio: novaDataInicio.trim(),
+        dataFim: novaDataFim.trim()
+      };
+      salvarFerias(ferias);
+      renderizar();
+    }
+
+    function excluir(index) {
+      if (!confirm("Deseja realmente excluir este registro?")) return;
+      let ferias = carregarFerias();
+      ferias.splice(index, 1);
+      salvarFerias(ferias);
+      renderizar();
+    }
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const novaFerias = {
+        nome: form.nome.value.trim(),
+        cpf: form.cpf.value.trim(),
+        local: form.local.value.trim(),
+        dataInicio: form.dataInicio.value,
+        dataFim: form.dataFim.value,
+      };
+
+      if (!novaFerias.nome || !novaFerias.cpf || !novaFerias.local || !novaFerias.dataInicio || !novaFerias.dataFim) {
+        alert("Preencha todos os campos.");
+        return;
+      }
+
+      let ferias = carregarFerias();
+      ferias.push(novaFerias);
+      salvarFerias(ferias);
+
+      form.reset();
+      renderizar();
+    });
+
+    ordenar.addEventListener("change", renderizar);
+
+    renderizar();
+  </script>
+</body>
+</html>

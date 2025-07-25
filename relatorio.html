@@ -2,103 +2,62 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Relatório de Funcionários</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: Arial, sans-serif;
-      background-color: #f9d5ec;
+      background: #fce4ec;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
     }
-
     header {
-      background-color: #f06292;
+      background: #f06292;
       width: 100%;
       padding: 10px;
       display: flex;
       justify-content: center;
       gap: 10px;
-      flex-wrap: wrap;
     }
-
     header a {
+      color: white;
       text-decoration: none;
-      background: #fff;
-      color: #f06292;
-      font-weight: bold;
       padding: 10px 15px;
+      background: #ec407a;
       border-radius: 8px;
-      transition: 0.3s;
     }
-
-    header a:hover {
-      background-color: #f8bbd0;
-    }
-
-    main {
+    .container {
       background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
       width: 90%;
-      max-width: 900px;
-      margin-top: 40px;
-      text-align: center;
+      max-width: 800px;
     }
-
-    h1, h2 {
-      color: #f06292;
-      margin-bottom: 20px;
-    }
-
-    form {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    input, button {
-      padding: 10px;
-      border-radius: 8px;
+    input, select, button {
+      margin: 5px;
+      padding: 8px;
+      border-radius: 5px;
       border: 1px solid #ccc;
     }
-
-    button {
-      background-color: #f06292;
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #ec407a;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 30px;
+      margin-top: 10px;
     }
-
     th, td {
-      border: 1px solid #ccc;
       padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
     }
-
-    .acoes button {
-      margin: 0 5px;
-      padding: 5px 10px;
-    }
-
-    .editando {
-      background-color: #fff3cd !important;
+    .btn {
+      background: #f06292;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -114,112 +73,81 @@
     <a href="relatorio.html">Gerar Relatório</a>
   </header>
 
-  <main>
-    <h1>Relatório por Período</h1>
-    <form id="filtroForm">
-      <input type="date" id="inicio" required>
-      <input type="date" id="fim" required>
-      <button type="submit">Gerar Relatório</button>
-    </form>
+  <div class="container">
+    <h2>Relatório de Funcionários</h2>
+    <label for="inicio">Início:</label>
+    <input type="date" id="inicio">
+    <label for="fim">Fim:</label>
+    <input type="date" id="fim">
+    <button class="btn" onclick="gerarRelatorio()">Gerar</button>
 
-    <div id="relatorioContent"></div>
-  </main>
+    <table id="tabelaRelatorio">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Motivo</th>
+          <th>Data</th>
+          <th>Local</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
-    const form = document.getElementById('filtroForm');
-    const container = document.getElementById('relatorioContent');
+    function gerarRelatorio() {
+      const inicio = document.getElementById('inicio').value;
+      const fim = document.getElementById('fim').value;
+      const tbody = document.querySelector('#tabelaRelatorio tbody');
+      tbody.innerHTML = '';
 
-    function filtrarPorData(lista, campoData, inicio, fim) {
-      return lista.map((item, index) => ({ ...item, index }))
-        .filter(item => {
-          const data = new Date(item[campoData]);
-          return data >= inicio && data <= fim;
-        });
-    }
+      const dados = [
+        ...JSON.parse(localStorage.getItem('demissoes') || '[]'),
+        ...JSON.parse(localStorage.getItem('avisoPrevio') || '[]'),
+        ...JSON.parse(localStorage.getItem('ferias') || '[]')
+      ];
 
-    function criarTabela(titulo, dados, colunas, tipoStorage) {
-      let html = `<h2>${titulo}</h2>`;
-      if (dados.length === 0) {
-        html += `<p>Nenhum registro encontrado.</p>`;
-        return html;
-      }
+      const filtrados = dados.filter(item => {
+        return (!inicio || item.data >= inicio) && (!fim || item.data <= fim);
+      });
 
-      html += `<table><thead><tr>`;
-      colunas.forEach(col => html += `<th>${col}</th>`);
-      html += `<th>Ações</th></tr></thead><tbody>`;
-
-      dados.forEach((item, i) => {
-        html += `<tr data-tipo="${tipoStorage}" data-index="${item.index}">`;
-        colunas.forEach(col => {
-          html += `<td contenteditable="false" class="celula" data-campo="${col}">${item[col]}</td>`;
-        });
-        html += `
-          <td class="acoes">
-            <button onclick="editarRegistro(this)">Editar</button>
-            <button onclick="salvarRegistro(this)" style="display:none;">Salvar</button>
-            <button onclick="excluirRegistro('${tipoStorage}', ${item.index}, this)">Excluir</button>
+      filtrados.forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.nome}</td>
+          <td>${item.cpf}</td>
+          <td>${item.motivo || '-'}</td>
+          <td>${item.data}</td>
+          <td>${item.local || '-'}</td>
+          <td>
+            <button class="btn" onclick="editar(${index})">Editar</button>
+            <button class="btn" onclick="excluir(${index})">Excluir</button>
           </td>
-        </tr>`;
+        `;
+        tbody.appendChild(tr);
       });
-
-      html += `</tbody></table>`;
-      return html;
     }
 
-    function editarRegistro(btn) {
-      const row = btn.closest('tr');
-      row.classList.add('editando');
-      row.querySelectorAll('.celula').forEach(td => td.contentEditable = true);
-      btn.style.display = 'none';
-      btn.nextElementSibling.style.display = 'inline-block'; // botão salvar
+    function excluir(index) {
+      const confirmacao = confirm("Deseja realmente excluir este registro?");
+      if (!confirmacao) return;
+
+      let dados = [
+        ...JSON.parse(localStorage.getItem('demissoes') || '[]'),
+        ...JSON.parse(localStorage.getItem('avisoPrevio') || '[]'),
+        ...JSON.parse(localStorage.getItem('ferias') || '[]')
+      ];
+
+      dados.splice(index, 1);
+      localStorage.setItem('relatorioGeral', JSON.stringify(dados));
+      gerarRelatorio();
     }
 
-    function salvarRegistro(btn) {
-      const row = btn.closest('tr');
-      const tipo = row.dataset.tipo;
-      const index = parseInt(row.dataset.index);
-      const dados = JSON.parse(localStorage.getItem(tipo)) || [];
-
-      row.querySelectorAll('.celula').forEach(td => {
-        const campo = td.dataset.campo;
-        dados[index][campo] = td.innerText.trim();
-      });
-
-      localStorage.setItem(tipo, JSON.stringify(dados));
-      row.classList.remove('editando');
-      row.querySelectorAll('.celula').forEach(td => td.contentEditable = false);
-      btn.style.display = 'none';
-      btn.previousElementSibling.style.display = 'inline-block';
+    function editar(index) {
+      alert("Função de edição ainda em desenvolvimento.");
     }
-
-    function excluirRegistro(tipo, index, btn) {
-      const lista = JSON.parse(localStorage.getItem(tipo)) || [];
-      lista.splice(index, 1);
-      localStorage.setItem(tipo, JSON.stringify(lista));
-      btn.closest('tr').remove();
-    }
-
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const inicio = new Date(document.getElementById('inicio').value);
-      const fim = new Date(document.getElementById('fim').value);
-      fim.setHours(23, 59, 59, 999); // incluir o dia final
-
-      const ferias = JSON.parse(localStorage.getItem('ferias')) || [];
-      const demissoes = JSON.parse(localStorage.getItem('demissoes')) || [];
-      const avisos = JSON.parse(localStorage.getItem('avisos')) || [];
-
-      const feriasFiltradas = filtrarPorData(ferias, 'dataInicio', inicio, fim);
-      const demissoesFiltradas = filtrarPorData(demissoes, 'data', inicio, fim);
-      const avisosFiltrados = filtrarPorData(avisos, 'dataInicio', inicio, fim);
-
-      let html = '';
-      html += criarTabela('Férias', feriasFiltradas, ['nome', 'dataInicio', 'dataFim', 'tipo'], 'ferias');
-      html += criarTabela('Demissões', demissoesFiltradas, ['nome', 'cpf', 'data', 'motivo', 'local'], 'demissoes');
-      html += criarTabela('Avisos Prévios', avisosFiltrados, ['nome', 'cpf', 'dataInicio', 'dataFim'], 'avisos');
-
-      container.innerHTML = html;
-    });
   </script>
 </body>
 </html>

@@ -1,147 +1,285 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cadastrar Funcionário - RH Evoluído</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cadastro de Funcionários Ativos</title>
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  html, body {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background: #fff0f6;
+    color: #4a2a4a;
+  }
+  body {
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+  header {
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(214,51,108,0.3);
+    padding: 10px 0;
+  }
+  nav ul {
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    list-style: none;
+    font-weight: 600;
+  }
+  nav a {
+    text-decoration: none;
+    color: #d6336c;
+    font-size: 1.1rem;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+  }
+  nav a:hover, nav a:focus {
+    background-color: #a02947;
+    color: white;
+    outline: none;
+  }
+  main {
+    flex: 1;
+    margin: 20px auto 40px;
+    background: white;
+    padding: 30px 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(214,51,108,0.25);
+    max-width: 600px;
+    width: 90%;
+  }
+  h1 {
+    color: #d6336c;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  form label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  form input[type="text"],
+  form input[type="date"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.8px solid #d6336c;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-top: 5px;
+  }
+  form button {
+    background: #d6336c;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+  }
+  form button:hover,
+  form button:focus {
+    background-color: #a02947;
+    outline: none;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+  }
+  th, td {
+    border: 1px solid #d6336c;
+    padding: 10px;
+    text-align: left;
+  }
+  th {
+    background: #f8cbd0;
+  }
+  td.actions {
+    text-align: center;
+  }
+  td.actions button {
+    background: #d6336c;
+    border: none;
+    color: white;
+    padding: 7px 12px;
+    margin-right: 5px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+  }
+  td.actions button:hover {
+    background: #a02947;
+  }
+  .sort-buttons {
+    margin-bottom: 15px;
+    text-align: right;
+  }
+  .sort-buttons button {
+    background: #d6336c;
+    border: none;
+    color: white;
+    padding: 6px 10px;
+    margin-left: 5px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+  }
+  .sort-buttons button:hover {
+    background: #a02947;
+  }
+</style>
 </head>
 <body>
-  <header>
-    <nav class="menu">
-      <ul>
-        <li><a href="index.html">Início</a></li>
-        <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
-        <li><a href="ativos.html">Funcionários Ativos</a></li>
-        <li><a href="inativos.html">Funcionários Inativos</a></li>
-        <li><a href="ferias.html">Lançar Férias</a></li>
-        <li><a href="demissao.html">Registrar Demissão</a></li>
-        <li><a href="aviso.html">Aviso Prévio</a></li>
-        <li><a href="relatorio.html">Gerar Relatório</a></li>
-      </ul>
-    </nav>
-  </header>
+<header>
+  <nav>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
+      <li><a href="ferias.html">Lançar Férias</a></li>
+      <li><a href="demissao.html">Registrar Demissão</a></li>
+      <li><a href="aviso.html">Aviso Prévio</a></li>
+      <li><a href="ativos.html">Funcionários Ativos</a></li>
+      <li><a href="inativos.html">Funcionários Inativos</a></li>
+      <li><a href="relatorio.html">Gerar Relatório</a></li>
+    </ul>
+  </nav>
+</header>
+<main>
+  <h1>Cadastro de Funcionários Ativos</h1>
+  <form id="formFuncionario">
+    <label>
+      Nome:
+      <input type="text" id="nome" required />
+    </label>
+    <label>
+      CPF:
+      <input type="text" id="cpf" required />
+    </label>
+    <label>
+      Data de Cadastro:
+      <input type="date" id="dataCadastro" required />
+    </label>
+    <button type="submit">Adicionar Funcionário</button>
+  </form>
 
-  <main>
-    <section class="container">
-      <h1>Cadastrar Funcionário</h1>
-      <form id="form-cadastro">
-        <label for="nome">Nome:</label>
-        <input type="text" id="nome" required />
+  <div class="sort-buttons">
+    <span>Ordenar por:</span>
+    <button onclick="ordenarPorNome()">Nome (A-Z)</button>
+    <button onclick="ordenarPorData()">Data (Mais recente)</button>
+  </div>
 
-        <label for="cpf">CPF:</label>
-        <input type="text" id="cpf" required />
+  <table id="tabelaFuncionarios">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Data de Cadastro</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</main>
 
-        <label for="local">Local:</label>
-        <input type="text" id="local" required />
+<script>
+  function getFuncionarios() {
+    return JSON.parse(localStorage.getItem('funcionariosAtivos') || '[]');
+  }
+  function salvarFuncionarios(funcionarios) {
+    localStorage.setItem('funcionariosAtivos', JSON.stringify(funcionarios));
+  }
+  function carregarFuncionarios() {
+    const funcionarios = getFuncionarios();
+    const tbody = document.querySelector('#tabelaFuncionarios tbody');
+    tbody.innerHTML = '';
 
-        <label for="dataCadastro">Data de Cadastro:</label>
-        <input type="date" id="dataCadastro" required />
-
-        <button type="submit">Cadastrar</button>
-      </form>
-
-      <h2>Funcionários Ativos</h2>
-      <label for="ordenar">Ordenar por:</label>
-      <select id="ordenar">
-        <option value="nome">Nome (A-Z)</option>
-        <option value="data">Data (mais recente)</option>
-      </select>
-
-      <ul id="lista-funcionarios"></ul>
-    </section>
-  </main>
-
-  <script>
-    const form = document.getElementById("form-cadastro");
-    const lista = document.getElementById("lista-funcionarios");
-    const ordenar = document.getElementById("ordenar");
-
-    function carregarFuncionarios() {
-      return JSON.parse(localStorage.getItem("funcionariosAtivos") || "[]");
-    }
-
-    function salvarFuncionarios(funcionarios) {
-      localStorage.setItem("funcionariosAtivos", JSON.stringify(funcionarios));
-    }
-
-    function renderizar() {
-      let funcionarios = carregarFuncionarios();
-
-      if (ordenar.value === "nome") {
-        funcionarios.sort((a, b) => a.nome.localeCompare(b.nome));
-      } else {
-        funcionarios.sort((a, b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
-      }
-
-      lista.innerHTML = "";
-
-      funcionarios.forEach((f, i) => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <strong>${f.nome}</strong> - CPF: ${f.cpf} - Local: ${f.local} - Data: ${f.dataCadastro}
-          <button onclick="editar(${i})">Editar</button>
-          <button onclick="excluir(${i})">Excluir</button>
-        `;
-        lista.appendChild(li);
-      });
-    }
-
-    function editar(index) {
-      let funcionarios = carregarFuncionarios();
-      const f = funcionarios[index];
-      const novoNome = prompt("Editar Nome:", f.nome);
-      if (novoNome === null || novoNome.trim() === "") return alert("Nome inválido");
-      const novoCpf = prompt("Editar CPF:", f.cpf);
-      if (novoCpf === null || novoCpf.trim() === "") return alert("CPF inválido");
-      const novoLocal = prompt("Editar Local:", f.local);
-      if (novoLocal === null || novoLocal.trim() === "") return alert("Local inválido");
-      const novaData = prompt("Editar Data (AAAA-MM-DD):", f.dataCadastro);
-      if (novaData === null || isNaN(Date.parse(novaData))) return alert("Data inválida");
-
-      funcionarios[index] = {
-        nome: novoNome.trim(),
-        cpf: novoCpf.trim(),
-        local: novoLocal.trim(),
-        dataCadastro: novaData.trim(),
-      };
-      salvarFuncionarios(funcionarios);
-      renderizar();
-    }
-
-    function excluir(index) {
-      if (!confirm("Deseja realmente excluir este funcionário?")) return;
-      let funcionarios = carregarFuncionarios();
-      funcionarios.splice(index, 1);
-      salvarFuncionarios(funcionarios);
-      renderizar();
-    }
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const novoFuncionario = {
-        nome: form.nome.value.trim(),
-        cpf: form.cpf.value.trim(),
-        local: form.local.value.trim(),
-        dataCadastro: form.dataCadastro.value,
-      };
-
-      if (!novoFuncionario.nome || !novoFuncionario.cpf || !novoFuncionario.local || !novoFuncionario.dataCadastro) {
-        alert("Preencha todos os campos corretamente.");
-        return;
-      }
-
-      let funcionarios = carregarFuncionarios();
-      funcionarios.push(novoFuncionario);
-      salvarFuncionarios(funcionarios);
-      form.reset();
-      renderizar();
+    funcionarios.forEach((f, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${f.nome}</td>
+        <td>${f.cpf}</td>
+        <td>${f.dataCadastro}</td>
+        <td class="actions">
+          <button onclick="editarFuncionario(${i})">Editar</button>
+          <button onclick="removerFuncionario(${i})">Excluir</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
     });
+  }
 
-    ordenar.addEventListener("change", renderizar);
+  document.getElementById('formFuncionario').addEventListener('submit', e => {
+    e.preventDefault();
+    const nome = document.getElementById('nome').value.trim();
+    const cpf = document.getElementById('cpf').value.trim();
+    const dataCadastro = document.getElementById('dataCadastro').value;
 
-    renderizar();
-  </script>
+    if (!nome || !cpf || !dataCadastro) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+
+    let funcionarios = getFuncionarios();
+    funcionarios.push({ nome, cpf, dataCadastro });
+    salvarFuncionarios(funcionarios);
+
+    e.target.reset();
+    carregarFuncionarios();
+  });
+
+  function editarFuncionario(index) {
+    let funcionarios = getFuncionarios();
+    const f = funcionarios[index];
+    const novoNome = prompt('Editar nome:', f.nome);
+    if (novoNome === null) return;
+    const novoCpf = prompt('Editar CPF:', f.cpf);
+    if (novoCpf === null) return;
+    const novaData = prompt('Editar data (AAAA-MM-DD):', f.dataCadastro);
+    if (novaData === null) return;
+    if (!novoNome.trim() || !novoCpf.trim() || !novaData.trim()) {
+      alert('Campos não podem ficar vazios!');
+      return;
+    }
+    funcionarios[index] = { nome: novoNome.trim(), cpf: novoCpf.trim(), dataCadastro: novaData.trim() };
+    salvarFuncionarios(funcionarios);
+    carregarFuncionarios();
+  }
+
+  function removerFuncionario(index) {
+    if (!confirm('Confirma exclusão do funcionário?')) return;
+    let funcionarios = getFuncionarios();
+    funcionarios.splice(index, 1);
+    salvarFuncionarios(funcionarios);
+    carregarFuncionarios();
+  }
+
+  function ordenarPorNome() {
+    let funcionarios = getFuncionarios();
+    funcionarios.sort((a,b) => a.nome.localeCompare(b.nome));
+    salvarFuncionarios(funcionarios);
+    carregarFuncionarios();
+  }
+  function ordenarPorData() {
+    let funcionarios = getFuncionarios();
+    funcionarios.sort((a,b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
+    salvarFuncionarios(funcionarios);
+    carregarFuncionarios();
+  }
+
+  carregarFuncionarios();
+</script>
 </body>
 </html>
-

@@ -9,16 +9,16 @@
     body {
       font-family: Arial, sans-serif;
       background-color: #f9d5ec;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      min-height: 100vh;
     }
 
     header {
-      width: 100%;
       background-color: #f06292;
-      padding: 10px 0;
+      width: 100%;
+      padding: 10px;
       display: flex;
       justify-content: center;
       gap: 10px;
@@ -27,7 +27,7 @@
 
     header a {
       text-decoration: none;
-      background-color: #fff;
+      background: #fff;
       color: #f06292;
       font-weight: bold;
       padding: 10px 15px;
@@ -35,16 +35,18 @@
       transition: 0.3s;
     }
 
-    header a:hover { background-color: #f8bbd0; }
+    header a:hover {
+      background-color: #f8bbd0;
+    }
 
     main {
-      background-color: white;
-      margin-top: 40px;
+      background: white;
       padding: 30px;
       border-radius: 15px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       width: 90%;
       max-width: 900px;
+      margin-top: 40px;
       text-align: center;
     }
 
@@ -56,8 +58,8 @@
     form {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;
       justify-content: center;
+      flex-wrap: wrap;
       margin-bottom: 20px;
     }
 
@@ -75,7 +77,9 @@
       cursor: pointer;
     }
 
-    button:hover { background-color: #ec407a; }
+    button:hover {
+      background-color: #ec407a;
+    }
 
     table {
       width: 100%;
@@ -86,25 +90,15 @@
     th, td {
       border: 1px solid #ccc;
       padding: 10px;
-      text-align: center;
     }
 
-    .btn-edit, .btn-delete {
+    .acoes button {
+      margin: 0 5px;
       padding: 5px 10px;
-      margin: 2px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
     }
 
-    .btn-edit {
-      background-color: #f8bbd0;
-      color: #333;
-    }
-
-    .btn-delete {
-      background-color: #f06262;
-      color: white;
+    .editando {
+      background-color: #fff3cd !important;
     }
   </style>
 </head>
@@ -137,67 +131,79 @@
 
     function filtrarPorData(lista, campoData, inicio, fim) {
       return lista.map((item, index) => ({ ...item, index }))
-                  .filter(item => {
-                    const data = new Date(item[campoData]);
-                    return data >= inicio && data <= fim;
-                  });
+        .filter(item => {
+          const data = new Date(item[campoData]);
+          return data >= inicio && data <= fim;
+        });
     }
 
-    function criarTabela(tipo, titulo, dados, colunas) {
+    function criarTabela(titulo, dados, colunas, tipoStorage) {
       let html = `<h2>${titulo}</h2>`;
-      if (dados.length === 0) return html + `<p>Nenhum registro encontrado.</p>`;
+      if (dados.length === 0) {
+        html += `<p>Nenhum registro encontrado.</p>`;
+        return html;
+      }
 
       html += `<table><thead><tr>`;
       colunas.forEach(col => html += `<th>${col}</th>`);
       html += `<th>Ações</th></tr></thead><tbody>`;
 
-      dados.forEach(item => {
-        html += `<tr>`;
-        colunas.forEach(col => html += `<td>${item[col]}</td>`);
-        html += `<td>
-          <button class="btn-edit" onclick="editarRegistro('${tipo}', ${item.index})">Editar</button>
-          <button class="btn-delete" onclick="excluirRegistro('${tipo}', ${item.index})">Excluir</button>
-        </td></tr>`;
+      dados.forEach((item, i) => {
+        html += `<tr data-tipo="${tipoStorage}" data-index="${item.index}">`;
+        colunas.forEach(col => {
+          html += `<td contenteditable="false" class="celula" data-campo="${col}">${item[col]}</td>`;
+        });
+        html += `
+          <td class="acoes">
+            <button onclick="editarRegistro(this)">Editar</button>
+            <button onclick="salvarRegistro(this)" style="display:none;">Salvar</button>
+            <button onclick="excluirRegistro('${tipoStorage}', ${item.index}, this)">Excluir</button>
+          </td>
+        </tr>`;
       });
 
       html += `</tbody></table>`;
       return html;
     }
 
-    function editarRegistro(tipo, index) {
-      const registros = JSON.parse(localStorage.getItem(tipo)) || [];
-      const registro = registros[index];
-
-      const campos = Object.keys(registro);
-      campos.splice(campos.indexOf("index"), 1); // remove 'index'
-
-      let novosDados = {};
-      for (let campo of campos) {
-        const valor = prompt(`Editar ${campo}:`, registro[campo]);
-        if (valor === null) return; // cancelado
-        novosDados[campo] = valor;
-      }
-
-      registros[index] = { ...novosDados };
-      localStorage.setItem(tipo, JSON.stringify(registros));
-      alert("Registro atualizado!");
-      form.dispatchEvent(new Event('submit'));
+    function editarRegistro(btn) {
+      const row = btn.closest('tr');
+      row.classList.add('editando');
+      row.querySelectorAll('.celula').forEach(td => td.contentEditable = true);
+      btn.style.display = 'none';
+      btn.nextElementSibling.style.display = 'inline-block'; // botão salvar
     }
 
-    function excluirRegistro(tipo, index) {
-      if (!confirm("Deseja realmente excluir este registro?")) return;
-      const registros = JSON.parse(localStorage.getItem(tipo)) || [];
-      registros.splice(index, 1);
-      localStorage.setItem(tipo, JSON.stringify(registros));
-      alert("Registro excluído com sucesso!");
-      form.dispatchEvent(new Event('submit'));
+    function salvarRegistro(btn) {
+      const row = btn.closest('tr');
+      const tipo = row.dataset.tipo;
+      const index = parseInt(row.dataset.index);
+      const dados = JSON.parse(localStorage.getItem(tipo)) || [];
+
+      row.querySelectorAll('.celula').forEach(td => {
+        const campo = td.dataset.campo;
+        dados[index][campo] = td.innerText.trim();
+      });
+
+      localStorage.setItem(tipo, JSON.stringify(dados));
+      row.classList.remove('editando');
+      row.querySelectorAll('.celula').forEach(td => td.contentEditable = false);
+      btn.style.display = 'none';
+      btn.previousElementSibling.style.display = 'inline-block';
+    }
+
+    function excluirRegistro(tipo, index, btn) {
+      const lista = JSON.parse(localStorage.getItem(tipo)) || [];
+      lista.splice(index, 1);
+      localStorage.setItem(tipo, JSON.stringify(lista));
+      btn.closest('tr').remove();
     }
 
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       const inicio = new Date(document.getElementById('inicio').value);
       const fim = new Date(document.getElementById('fim').value);
-      fim.setHours(23, 59, 59, 999);
+      fim.setHours(23, 59, 59, 999); // incluir o dia final
 
       const ferias = JSON.parse(localStorage.getItem('ferias')) || [];
       const demissoes = JSON.parse(localStorage.getItem('demissoes')) || [];
@@ -208,9 +214,9 @@
       const avisosFiltrados = filtrarPorData(avisos, 'dataInicio', inicio, fim);
 
       let html = '';
-      html += criarTabela('ferias', 'Férias', feriasFiltradas, ['nome', 'dataInicio', 'dataFim', 'tipo']);
-      html += criarTabela('demissoes', 'Demissões', demissoesFiltradas, ['nome', 'cpf', 'data', 'motivo', 'local']);
-      html += criarTabela('avisos', 'Avisos Prévios', avisosFiltrados, ['nome', 'cpf', 'dataInicio', 'dataFim']);
+      html += criarTabela('Férias', feriasFiltradas, ['nome', 'dataInicio', 'dataFim', 'tipo'], 'ferias');
+      html += criarTabela('Demissões', demissoesFiltradas, ['nome', 'cpf', 'data', 'motivo', 'local'], 'demissoes');
+      html += criarTabela('Avisos Prévios', avisosFiltrados, ['nome', 'cpf', 'dataInicio', 'dataFim'], 'avisos');
 
       container.innerHTML = html;
     });

@@ -1,83 +1,238 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cadastrar Funcionário</title>
-<link rel="stylesheet" href="style.css" />
-<script src="menu.js" defer></script>
+  <meta charset="UTF-8" />
+  <title>Cadastrar Funcionário</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9d5ec;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background-color: #f06292;
+      padding: 10px 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    header a {
+      text-decoration: none;
+      background-color: #fff;
+      color: #f06292;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    header a:hover {
+      background-color: #f8bbd0;
+    }
+
+    main {
+      background-color: white;
+      margin-top: 40px;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #f06292;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #f06292;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ec407a;
+    }
+
+    .ordem {
+      margin-bottom: 10px;
+      text-align: right;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    td button {
+      margin: 0 3px;
+      background-color: #f06292;
+      color: #fff;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    td button:hover {
+      background-color: #d81b60;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
+  <header>
+    <a href="index.html">Início</a>
+    <a href="cadastrar.html">Cadastrar Funcionário</a>
+    <a href="ativos.html">Funcionários Ativos</a>
+    <a href="inativos.html">Funcionários Inativos</a>
+    <a href="ferias.html">Lançar Férias</a>
+    <a href="demissao.html">Registrar Demissão</a>
+    <a href="aviso.html">Aviso Prévio</a>
+    <a href="relatorio.html">Gerar Relatório</a>
+  </header>
+
+  <main>
     <h1>Cadastrar Funcionário</h1>
-    <form id="formCadastro">
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" required />
-      <label for="cpf">CPF:</label>
-      <input type="text" id="cpf" required />
-      <label for="local">Local:</label>
-      <input type="text" id="local" required />
-      <button type="submit">Adicionar Funcionário</button>
+    <form id="formFuncionario">
+      <input type="text" id="nome" placeholder="Nome" required>
+      <input type="text" id="cpf" placeholder="CPF" required>
+      <button type="submit">Salvar</button>
     </form>
 
-    <table id="tabelaCadastro" style="display:none;">
+    <div class="ordem">
+      <label for="ordenar">Ordenar por:</label>
+      <select id="ordenar">
+        <option value="data">Data de Cadastro (Recente)</option>
+        <option value="nome">Nome (A-Z)</option>
+      </select>
+    </div>
+
+    <table id="tabelaFuncionarios">
       <thead>
-        <tr><th>Nome</th><th>CPF</th><th>Local</th><th>Data Cadastro</th></tr>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Ações</th>
+        </tr>
       </thead>
       <tbody></tbody>
     </table>
-  </div>
+  </main>
 
   <script>
-    function formatDateISOtoBR(isoStr) {
-      const d = new Date(isoStr);
-      return d.toLocaleDateString('pt-BR');
+    const form = document.getElementById('formFuncionario');
+    const nomeInput = document.getElementById('nome');
+    const cpfInput = document.getElementById('cpf');
+    const tabela = document.querySelector('#tabelaFuncionarios tbody');
+    const ordenarSelect = document.getElementById('ordenar');
+
+    let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
+    let editandoCPF = null;
+
+    function salvarFuncionarios() {
+      localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+      renderizarTabela();
     }
 
-    function carregarCadastro() {
-      const lista = JSON.parse(localStorage.getItem('funcionariosAtivos')) || [];
-      const tbody = document.querySelector('#tabelaCadastro tbody');
-      tbody.innerHTML = '';
-      if (lista.length === 0) {
-        document.getElementById('tabelaCadastro').style.display = 'none';
-        return;
+    function renderizarTabela() {
+      let lista = [...funcionarios];
+      const ordem = ordenarSelect.value;
+
+      if (ordem === 'nome') {
+        lista.sort((a, b) => a.nome.localeCompare(b.nome));
+      } else {
+        lista.sort((a, b) => new Date(b.data) - new Date(a.data));
       }
-      document.getElementById('tabelaCadastro').style.display = '';
-      lista.forEach(f => {
+
+      tabela.innerHTML = '';
+      lista.forEach(func => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${f.nome}</td>
-          <td>${f.cpf}</td>
-          <td>${f.local}</td>
-          <td>${formatDateISOtoBR(f.dataCadastro)}</td>
+          <td>${func.nome}</td>
+          <td>${func.cpf}</td>
+          <td>
+            <button onclick="editarFuncionario('${func.cpf}')">Editar</button>
+            <button onclick="excluirFuncionario('${func.cpf}')">Excluir</button>
+          </td>
         `;
-        tbody.appendChild(tr);
+        tabela.appendChild(tr);
       });
     }
 
-    document.getElementById('formCadastro').addEventListener('submit', e => {
-      e.preventDefault();
-      const nome = document.getElementById('nome').value.trim();
-      const cpf = document.getElementById('cpf').value.trim();
-      const local = document.getElementById('local').value.trim();
-      if (!nome || !cpf || !local) {
-        alert('Preencha todos os campos');
-        return;
+    function editarFuncionario(cpf) {
+      const func = funcionarios.find(f => f.cpf === cpf);
+      if (func) {
+        nomeInput.value = func.nome;
+        cpfInput.value = func.cpf;
+        editandoCPF = cpf;
       }
-      const lista = JSON.parse(localStorage.getItem('funcionariosAtivos')) || [];
-      lista.push({
-        nome,
-        cpf,
-        local,
-        dataCadastro: new Date().toISOString()
-      });
-      localStorage.setItem('funcionariosAtivos', JSON.stringify(lista));
-      e.target.reset();
-      carregarCadastro();
-      alert('Funcionário adicionado com sucesso!');
+    }
+
+    function excluirFuncionario(cpf) {
+      funcionarios = funcionarios.filter(f => f.cpf !== cpf);
+      salvarFuncionarios();
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const nome = nomeInput.value.trim();
+      const cpf = cpfInput.value.trim();
+
+      if (!nome || !cpf) return;
+
+      if (editandoCPF) {
+        const index = funcionarios.findIndex(f => f.cpf === editandoCPF);
+        if (index !== -1) {
+          funcionarios[index] = { nome, cpf, data: funcionarios[index].data };
+        }
+        editandoCPF = null;
+      } else {
+        funcionarios.push({ nome, cpf, data: new Date().toISOString() });
+      }
+
+      form.reset();
+      salvarFuncionarios();
     });
 
-    window.onload = carregarCadastro;
+    ordenarSelect.addEventListener('change', renderizarTabela);
+
+    window.editarFuncionario = editarFuncionario;
+    window.excluirFuncionario = excluirFuncionario;
+
+    renderizarTabela();
   </script>
 </body>
 </html>

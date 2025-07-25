@@ -1,116 +1,185 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Gerar Relatório</title>
-<link rel="stylesheet" href="style.css" />
-<script src="menu.js" defer></script>
-<style>
-  pre {
-    background: #f8cbd0;
-    padding: 15px;
-    border-radius: 8px;
-    max-height: 300px;
-    overflow-y: auto;
-    text-align: left;
-    font-size: 0.9rem;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Relatório de Funcionários</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9d5ec;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background-color: #f06292;
+      padding: 10px 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    header a {
+      text-decoration: none;
+      background-color: #fff;
+      color: #f06292;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    header a:hover {
+      background-color: #f8bbd0;
+    }
+
+    main {
+      background-color: white;
+      margin-top: 40px;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #f06292;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #f06292;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ec407a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #f06292;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Gerar Relatório</h1>
-    <form id="formRelatorio">
-      <label for="dataInicio">Data Início:</label>
-      <input type="date" id="dataInicio" required />
-      <label for="dataFim">Data Fim:</label>
-      <input type="date" id="dataFim" required />
+  <header>
+    <a href="index.html">Início</a>
+    <a href="cadastrar.html">Cadastrar Funcionário</a>
+    <a href="ativos.html">Funcionários Ativos</a>
+    <a href="inativos.html">Funcionários Inativos</a>
+    <a href="ferias.html">Lançar Férias</a>
+    <a href="demissao.html">Registrar Demissão</a>
+    <a href="aviso.html">Aviso Prévio</a>
+    <a href="relatorio.html">Gerar Relatório</a>
+  </header>
+
+  <main>
+    <h1>Relatório por Período</h1>
+    <form id="filtroForm">
+      <input type="date" id="inicio" required>
+      <input type="date" id="fim" required>
       <button type="submit">Gerar Relatório</button>
     </form>
-    <pre id="resultado" style="display:none;"></pre>
-  </div>
+
+    <div id="relatorioContent"></div>
+  </main>
 
   <script>
-    function formatDateBR(isoStr) {
-      if (!isoStr) return '';
-      const d = new Date(isoStr);
-      return d.toLocaleDateString('pt-BR');
-    }
+    const form = document.getElementById('filtroForm');
+    const container = document.getElementById('relatorioContent');
 
-    function filtrarPorData(lista, dataInicio, dataFim) {
+    function filtrarPorData(lista, campoData, inicio, fim) {
       return lista.filter(item => {
-        const dataItem = new Date(item.dataCadastro || item.dataDemissao || item.dataInicio || item.dataFim);
-        return dataItem >= dataInicio && dataItem <= dataFim;
+        const data = new Date(item[campoData]);
+        return data >= inicio && data <= fim;
       });
     }
 
-    function montarRelatorio(listaAtivos, listaInativos, listaFerias, listaAviso, dataInicio, dataFim) {
-      let rel = 'Relatório RH Evoluído\n\n';
-
-      rel += 'Funcionários Ativos:\n';
-      const ativosFiltrados = listaAtivos.filter(f => {
-        const data = new Date(f.dataCadastro);
-        return data >= dataInicio && data <= dataFim;
-      });
-      ativosFiltrados.forEach(f => {
-        rel += `- ${f.nome} | CPF: ${f.cpf} | Local: ${f.local} | Data Cadastro: ${formatDateBR(f.dataCadastro)}\n`;
-      });
-      rel += '\n';
-
-      rel += 'Funcionários Inativos:\n';
-      const inativosFiltrados = listaInativos.filter(f => {
-        const data = new Date(f.dataDemissao);
-        return data >= dataInicio && data <= dataFim;
-      });
-      inativosFiltrados.forEach(f => {
-        rel += `- ${f.nome} | CPF: ${f.cpf} | Data Demissão: ${formatDateBR(f.dataDemissao)} | Motivo: ${f.motivo} | Local: ${f.local}\n`;
-      });
-      rel += '\n';
-
-      rel += 'Férias Registradas:\n';
-      const feriasFiltradas = listaFerias.filter(f => {
-        const inicio = new Date(f.dataInicio);
-        const fim = new Date(f.dataFim);
-        // Verifica se período de férias intersecta com intervalo
-        return (inicio <= dataFim && fim >= dataInicio);
-      });
-      feriasFiltradas.forEach(f => {
-        rel += `- ${f.nome} | CPF: ${f.cpf} | Início: ${formatDateBR(f.dataInicio)} | Fim: ${formatDateBR(f.dataFim)}\n`;
-      });
-      rel += '\n';
-
-      rel += 'Aviso Prévio:\n';
-      const avisoFiltrados = listaAviso.filter(f => {
-        const data = new Date(f.dataInicio);
-        return data >= dataInicio && data <= dataFim;
-      });
-      avisoFiltrados.forEach(f => {
-        rel += `- ${f.nome} | CPF: ${f.cpf} | Data Início: ${formatDateBR(f.dataInicio)} | Data Fim: ${formatDateBR(f.dataFim)} | Local: ${f.local}\n`;
-      });
-
-      return rel;
-    }
-
-    document.getElementById('formRelatorio').addEventListener('submit', e => {
-      e.preventDefault();
-      const dataInicio = new Date(document.getElementById('dataInicio').value);
-      const dataFim = new Date(document.getElementById('dataFim').value);
-
-      if (!dataInicio || !dataFim || dataInicio > dataFim) {
-        alert('Informe um intervalo de datas válido!');
-        return;
+    function criarTabela(titulo, dados, colunas) {
+      let html = `<h2>${titulo}</h2>`;
+      if (dados.length === 0) {
+        html += `<p>Nenhum registro encontrado.</p>`;
+        return html;
       }
 
-      const listaAtivos = JSON.parse(localStorage.getItem('funcionariosAtivos')) || [];
-      const listaInativos = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
-      const listaFerias = JSON.parse(localStorage.getItem('ferias')) || [];
-      const listaAviso = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
+      html += `<table><thead><tr>`;
+      colunas.forEach(col => {
+        html += `<th>${col}</th>`;
+      });
+      html += `</tr></thead><tbody>`;
+      dados.forEach(item => {
+        html += `<tr>`;
+        colunas.forEach(col => {
+          html += `<td>${item[col]}</td>`;
+        });
+        html += `</tr>`;
+      });
+      html += `</tbody></table>`;
+      return html;
+    }
 
-      const relatorio = montarRelatorio(listaAtivos, listaInativos, listaFerias, listaAviso, dataInicio, dataFim);
-      const resultado = document.getElementById('resultado');
-      resultado.textContent = relatorio;
-      resultado.style.display = 'block';
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const inicio = new Date(document.getElementById('inicio').value);
+      const fim = new Date(document.getElementById('fim').value);
+      fim.setHours(23, 59, 59, 999); // garantir inclusão do último dia
+
+      const ferias = JSON.parse(localStorage.getItem('ferias')) || [];
+      const demissoes = JSON.parse(localStorage.getItem('demissoes')) || [];
+      const avisos = JSON.parse(localStorage.getItem('avisos')) || [];
+
+      const feriasFiltradas = filtrarPorData(ferias, 'dataInicio', inicio, fim);
+      const demissoesFiltradas = filtrarPorData(demissoes, 'data', inicio, fim);
+      const avisosFiltrados = filtrarPorData(avisos, 'dataInicio', inicio, fim);
+
+      let html = '';
+      html += criarTabela('Férias', feriasFiltradas, ['nome', 'dataInicio', 'dataFim', 'tipo']);
+      html += criarTabela('Demissões', demissoesFiltradas, ['nome', 'cpf', 'data', 'motivo', 'local']);
+      html += criarTabela('Avisos Prévios', avisosFiltrados, ['nome', 'cpf', 'dataInicio', 'dataFim']);
+
+      container.innerHTML = html;
     });
   </script>
 </body>

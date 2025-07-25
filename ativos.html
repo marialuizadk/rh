@@ -1,160 +1,288 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Funcionários Ativos</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #ffe6f0;
-    }
-    nav {
-      background-color: #ff66b2;
-      padding: 15px;
-      text-align: center;
-    }
-    nav a {
-      background-color: white;
-      color: #ff66b2;
-      text-decoration: none;
-      margin: 0 10px;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-weight: bold;
-      display: inline-block;
-    }
-    nav a:hover {
-      background-color: #ffe6f0;
-    }
-    .container {
-      background-color: white;
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-    h2 {
-      color: #ff66b2;
-      text-align: center;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background-color: #ff66b2;
-      color: white;
-      padding: 10px 20px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    select {
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 8px;
-      width: 100%;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-      margin-top: 20px;
-    }
-    li {
-      background-color: #ffe6f0;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .actions button {
-      margin-left: 5px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>Funcionários Ativos</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background:#f9d5ec;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  header {
+    width: 100%;
+    background:#f06292;
+    padding: 10px 0;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap: wrap;
+  }
+  header a {
+    text-decoration:none;
+    background:#fff;
+    color:#f06292;
+    font-weight:bold;
+    padding:10px 15px;
+    border-radius:8px;
+    transition:0.3s;
+  }
+  header a:hover {
+    background:#f8bbd0;
+  }
+  main {
+    background:#fff;
+    margin-top:40px;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 0 10px rgba(0,0,0,0.1);
+    width:90%;
+    max-width:700px;
+    text-align:center;
+    flex-grow:1;
+  }
+  h1 {
+    color:#f06292;
+    margin-bottom:20px;
+  }
+  form {
+    margin-bottom: 20px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap: wrap;
+  }
+  input {
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    width: 150px;
+  }
+  button {
+    background:#f06292;
+    color:#fff;
+    font-weight:bold;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background:#d81b60;
+  }
+  .btn-ordenar {
+    background: #f8bbd0;
+    color: #f06292;
+    font-weight: bold;
+    padding: 6px 12px;
+    border-radius: 8px;
+  }
+  table {
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+  }
+  th, td {
+    border:1px solid #ccc;
+    padding:10px;
+  }
+  td button {
+    margin: 0 3px;
+    background:#f06292;
+    color:#fff;
+    border:none;
+    padding:5px 8px;
+    border-radius:5px;
+    cursor:pointer;
+    transition: background-color 0.3s;
+  }
+  td button:hover {
+    background:#d81b60;
+  }
+</style>
 </head>
 <body>
-  <nav>
-    <a href="index.html">Início</a>
-    <a href="cadastro.html">Cadastrar Funcionário</a>
-    <a href="ativos.html">Funcionários Ativos</a>
-    <a href="inativos.html">Funcionários Inativos</a>
-    <a href="ferias.html">Lançar Férias</a>
-    <a href="demissao.html">Registrar Demissão</a>
-    <a href="aviso.html">Aviso Prévio</a>
-    <a href="relatorio.html">Gerar Relatório</a>
-  </nav>
-  <div class="container">
-    <h2>Funcionários Ativos</h2>
-    <select id="ordenar" onchange="ordenarLista()">
-      <option value="nome">Ordenar por Nome (A-Z)</option>
-      <option value="data">Ordenar por Data (Recente)</option>
-    </select>
-    <ul id="listaAtivos"></ul>
+<header>
+  <a href="index.html">Início</a>
+  <a href="cadastrar.html">Cadastrar Funcionário</a>
+  <a href="ativos.html">Funcionários Ativos</a>
+  <a href="inativos.html">Funcionários Inativos</a>
+  <a href="ferias.html">Lançar Férias</a>
+  <a href="demissao.html">Registrar Demissão</a>
+  <a href="aviso.html">Aviso Prévio</a>
+  <a href="relatorio.html">Gerar Relatório</a>
+</header>
+<main>
+  <h1>Funcionários Ativos</h1>
+
+  <div style="margin-bottom:15px;">
+    <button class="btn-ordenar" id="ordenarNome">Ordenar por Nome (A-Z)</button>
+    <button class="btn-ordenar" id="ordenarData">Ordenar por Data (Mais recentes)</button>
   </div>
 
-  <script>
-    const lista = document.getElementById('listaAtivos');
-    let funcionarios = JSON.parse(localStorage.getItem('funcionariosAtivos')) || [];
+  <form id="formEditar" style="display:none;" autocomplete="off">
+    <input type="text" id="nomeEditar" placeholder="Nome" required />
+    <input type="text" id="cpfEditar" placeholder="CPF" required />
+    <button type="submit">Salvar Alterações</button>
+    <button type="button" id="btnCancelar">Cancelar</button>
+  </form>
 
-    function renderizarLista() {
-      lista.innerHTML = '';
-      funcionarios.forEach((f, i) => {
-        const item = document.createElement('li');
-        item.innerHTML = `
-          <span><strong>${f.nome}</strong> - ${f.cpf} - ${f.data}</span>
-          <div class="actions">
-            <button onclick="editar(${i})">Editar</button>
-            <button onclick="excluir(${i})">Excluir</button>
-          </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>CPF</th>
+        <th>Data Cadastro</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="tabelaAtivos"></tbody>
+  </table>
+</main>
+<script>
+  (() => {
+    const tabela = document.getElementById('tabelaAtivos');
+    const formEditar = document.getElementById('formEditar');
+    const nomeEditar = document.getElementById('nomeEditar');
+    const cpfEditar = document.getElementById('cpfEditar');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const btnOrdenarNome = document.getElementById('ordenarNome');
+    const btnOrdenarData = document.getElementById('ordenarData');
+
+    let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
+    let indexEditando = null;
+    let ordemAtual = 'data'; // padrão: mostrar mais recentes primeiro
+
+    // Salva no localStorage
+    function salvarLocalStorage() {
+      localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+    }
+
+    // Renderiza tabela
+    function renderizarTabela() {
+      tabela.innerHTML = '';
+
+      // Ordena conforme ordemAtual
+      let listaExibir = [...funcionarios];
+      if (ordemAtual === 'nome') {
+        listaExibir.sort((a,b) => a.nome.localeCompare(b.nome));
+      } else {
+        // ordena por data cadastrada (mais recente primeiro)
+        listaExibir.sort((a,b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
+      }
+
+      listaExibir.forEach((func, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${func.nome}</td>
+          <td>${func.cpf}</td>
+          <td>${func.dataCadastro ? new Date(func.dataCadastro).toLocaleDateString() : ''}</td>
+          <td>
+            <button data-index="${idx}" class="btn-editar">Editar</button>
+            <button data-index="${idx}" class="btn-excluir">Excluir</button>
+          </td>
         `;
-        lista.appendChild(item);
+        tabela.appendChild(tr);
       });
     }
 
-    function editar(index) {
-      const novoNome = prompt('Novo nome:', funcionarios[index].nome);
-      if (novoNome !== null) {
-        funcionarios[index].nome = novoNome;
-        salvar();
-      }
-    }
-
-    function excluir(index) {
-      if (confirm('Tem certeza que deseja excluir?')) {
-        funcionarios.splice(index, 1);
-        salvar();
-      }
-    }
-
-    function salvar() {
-      localStorage.setItem('funcionariosAtivos', JSON.stringify(funcionarios));
-      renderizarLista();
-    }
-
-    function ordenarLista() {
-      const criterio = document.getElementById('ordenar').value;
-      if (criterio === 'nome') {
-        funcionarios.sort((a, b) => a.nome.localeCompare(b.nome));
+    // Mostra formulário de edição
+    function mostrarFormularioEdicao(idx) {
+      // idx é no array ordenado, precisamos o índice real no funcionarios
+      let listaOrdenada = [...funcionarios];
+      if (ordemAtual === 'nome') {
+        listaOrdenada.sort((a,b) => a.nome.localeCompare(b.nome));
       } else {
-        funcionarios.sort((a, b) => new Date(b.data) - new Date(a.data));
+        listaOrdenada.sort((a,b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
       }
-      renderizarLista();
+      const funcParaEditar = listaOrdenada[idx];
+
+      // Encontrar índice real no array original
+      indexEditando = funcionarios.findIndex(f => f.dataCadastro === funcParaEditar.dataCadastro && f.cpf === funcParaEditar.cpf && f.nome === funcParaEditar.nome);
+      if (indexEditando === -1) {
+        alert('Erro ao localizar funcionário para editar.');
+        return;
+      }
+
+      nomeEditar.value = funcParaEditar.nome;
+      cpfEditar.value = funcParaEditar.cpf;
+      formEditar.style.display = 'flex';
+      nomeEditar.focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    renderizarLista();
-  </script>
+    // Cancela edição
+    function cancelarEdicao() {
+      formEditar.style.display = 'none';
+      indexEditando = null;
+      formEditar.reset();
+    }
+
+    // Evento clique na tabela (delegação)
+    tabela.addEventListener('click', (e) => {
+      if (e.target.classList.contains('btn-editar')) {
+        const idx = Number(e.target.dataset.index);
+        mostrarFormularioEdicao(idx);
+      } else if (e.target.classList.contains('btn-excluir')) {
+        const idx = Number(e.target.dataset.index);
+        // exclui direto, sem confirmação, pra evitar travar
+        // Identificar funcionário real para excluir
+        let listaOrdenada = [...funcionarios];
+        if (ordemAtual === 'nome') {
+          listaOrdenada.sort((a,b) => a.nome.localeCompare(b.nome));
+        } else {
+          listaOrdenada.sort((a,b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
+        }
+        const funcParaExcluir = listaOrdenada[idx];
+
+        const realIdx = funcionarios.findIndex(f => f.dataCadastro === funcParaExcluir.dataCadastro && f.cpf === funcParaExcluir.cpf && f.nome === funcParaExcluir.nome);
+        if (realIdx !== -1) {
+          funcionarios.splice(realIdx,1);
+          salvarLocalStorage();
+          renderizarTabela();
+          if(indexEditando === realIdx) cancelarEdicao();
+        }
+      }
+    });
+
+    // Salvar edição
+    formEditar.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (indexEditando === null) return;
+
+      const nome = nomeEditar.value.trim();
+      const cpf = cpfEditar.value.trim();
+      if (!nome || !cpf) return alert('Preencha todos os campos!');
+
+      funcionarios[indexEditando].nome = nome;
+      funcionarios[indexEditando].cpf = cpf;
+      salvarLocalStorage();
+      renderizarTabela();
+      cancelarEdicao();
+    });
+
+    btnCancelar.addEventListener('click', cancelarEdicao);
+
+    // Ordenar por nome
+    btnOrdenarNome.addEventListener('click', () => {
+      ordemAtual = 'nome';
+      renderizarTabela();
+    });
+
+    // Ordenar por data
+    btnOrdenarData.addEventListener('click', () => {
+      ordemAtual = 'data';
+      renderizarTabela();
+    });
+
+    // Inicializa
+    renderizarTabela();
+  })();
+</script>
 </body>
 </html>

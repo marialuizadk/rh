@@ -4,11 +4,7 @@
   <meta charset="UTF-8">
   <title>Relatório de Funcionários</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -39,9 +35,7 @@
       transition: 0.3s;
     }
 
-    header a:hover {
-      background-color: #f8bbd0;
-    }
+    header a:hover { background-color: #f8bbd0; }
 
     main {
       background-color: white;
@@ -50,11 +44,11 @@
       border-radius: 15px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       width: 90%;
-      max-width: 800px;
+      max-width: 900px;
       text-align: center;
     }
 
-    h1 {
+    h1, h2 {
       color: #f06292;
       margin-bottom: 20px;
     }
@@ -81,9 +75,7 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #ec407a;
-    }
+    button:hover { background-color: #ec407a; }
 
     table {
       width: 100%;
@@ -97,9 +89,22 @@
       text-align: center;
     }
 
-    h2 {
-      margin-top: 30px;
-      color: #f06292;
+    .btn-edit, .btn-delete {
+      padding: 5px 10px;
+      margin: 2px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-edit {
+      background-color: #f8bbd0;
+      color: #333;
+    }
+
+    .btn-delete {
+      background-color: #f06262;
+      color: white;
     }
   </style>
 </head>
@@ -131,40 +136,68 @@
     const container = document.getElementById('relatorioContent');
 
     function filtrarPorData(lista, campoData, inicio, fim) {
-      return lista.filter(item => {
-        const data = new Date(item[campoData]);
-        return data >= inicio && data <= fim;
-      });
+      return lista.map((item, index) => ({ ...item, index }))
+                  .filter(item => {
+                    const data = new Date(item[campoData]);
+                    return data >= inicio && data <= fim;
+                  });
     }
 
-    function criarTabela(titulo, dados, colunas) {
+    function criarTabela(tipo, titulo, dados, colunas) {
       let html = `<h2>${titulo}</h2>`;
-      if (dados.length === 0) {
-        html += `<p>Nenhum registro encontrado.</p>`;
-        return html;
-      }
+      if (dados.length === 0) return html + `<p>Nenhum registro encontrado.</p>`;
 
       html += `<table><thead><tr>`;
-      colunas.forEach(col => {
-        html += `<th>${col}</th>`;
-      });
-      html += `</tr></thead><tbody>`;
+      colunas.forEach(col => html += `<th>${col}</th>`);
+      html += `<th>Ações</th></tr></thead><tbody>`;
+
       dados.forEach(item => {
         html += `<tr>`;
-        colunas.forEach(col => {
-          html += `<td>${item[col]}</td>`;
-        });
-        html += `</tr>`;
+        colunas.forEach(col => html += `<td>${item[col]}</td>`);
+        html += `<td>
+          <button class="btn-edit" onclick="editarRegistro('${tipo}', ${item.index})">Editar</button>
+          <button class="btn-delete" onclick="excluirRegistro('${tipo}', ${item.index})">Excluir</button>
+        </td></tr>`;
       });
+
       html += `</tbody></table>`;
       return html;
+    }
+
+    function editarRegistro(tipo, index) {
+      const registros = JSON.parse(localStorage.getItem(tipo)) || [];
+      const registro = registros[index];
+
+      const campos = Object.keys(registro);
+      campos.splice(campos.indexOf("index"), 1); // remove 'index'
+
+      let novosDados = {};
+      for (let campo of campos) {
+        const valor = prompt(`Editar ${campo}:`, registro[campo]);
+        if (valor === null) return; // cancelado
+        novosDados[campo] = valor;
+      }
+
+      registros[index] = { ...novosDados };
+      localStorage.setItem(tipo, JSON.stringify(registros));
+      alert("Registro atualizado!");
+      form.dispatchEvent(new Event('submit'));
+    }
+
+    function excluirRegistro(tipo, index) {
+      if (!confirm("Deseja realmente excluir este registro?")) return;
+      const registros = JSON.parse(localStorage.getItem(tipo)) || [];
+      registros.splice(index, 1);
+      localStorage.setItem(tipo, JSON.stringify(registros));
+      alert("Registro excluído com sucesso!");
+      form.dispatchEvent(new Event('submit'));
     }
 
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       const inicio = new Date(document.getElementById('inicio').value);
       const fim = new Date(document.getElementById('fim').value);
-      fim.setHours(23, 59, 59, 999); // garantir inclusão do último dia
+      fim.setHours(23, 59, 59, 999);
 
       const ferias = JSON.parse(localStorage.getItem('ferias')) || [];
       const demissoes = JSON.parse(localStorage.getItem('demissoes')) || [];
@@ -175,9 +208,9 @@
       const avisosFiltrados = filtrarPorData(avisos, 'dataInicio', inicio, fim);
 
       let html = '';
-      html += criarTabela('Férias', feriasFiltradas, ['nome', 'dataInicio', 'dataFim', 'tipo']);
-      html += criarTabela('Demissões', demissoesFiltradas, ['nome', 'cpf', 'data', 'motivo', 'local']);
-      html += criarTabela('Avisos Prévios', avisosFiltrados, ['nome', 'cpf', 'dataInicio', 'dataFim']);
+      html += criarTabela('ferias', 'Férias', feriasFiltradas, ['nome', 'dataInicio', 'dataFim', 'tipo']);
+      html += criarTabela('demissoes', 'Demissões', demissoesFiltradas, ['nome', 'cpf', 'data', 'motivo', 'local']);
+      html += criarTabela('avisos', 'Avisos Prévios', avisosFiltrados, ['nome', 'cpf', 'dataInicio', 'dataFim']);
 
       container.innerHTML = html;
     });

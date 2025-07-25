@@ -4,92 +4,166 @@
   <meta charset="UTF-8" />
   <title>Funcionários Ativos</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f9d5ec; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; }
-    header { width:100%; background:#f06292; padding:10px 0; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-    header a { text-decoration:none; background:#fff; color:#f06292; font-weight:bold; padding:10px 15px; border-radius:8px; transition:0.3s; }
-    header a:hover { background:#f8bbd0; }
-    main { background:#fff; margin-top:40px; padding:30px; border-radius:15px; box-shadow:0 0 10px rgba(0,0,0,0.1); width:90%; max-width:800px; text-align:center; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; }
-    th, td { border:1px solid #ccc; padding:10px; }
-    button { background:#f06292; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px; }
-    button:hover { background:#d81b60; }
-    select { margin-bottom: 15px; padding: 5px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #fce4ec;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: 100%;
+      background: #f06292;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    header a {
+      background: #fff;
+      color: #f06292;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+    main {
+      margin-top: 40px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 900px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background: #f8bbd0;
+    }
+    button {
+      background: #f06292;
+      border: none;
+      padding: 6px 12px;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 2px;
+    }
+    button:hover {
+      background: #d81b60;
+    }
+    select {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
   </style>
 </head>
 <body>
-<header>
-  <a href="index.html">Início</a>
-  <a href="cadastro.html">Cadastrar Funcionário</a>
-  <a href="ativos.html">Funcionários Ativos</a>
-</header>
-<main>
-  <h1>Funcionários Ativos</h1>
-  <label>Ordenar por: 
+  <header>
+    <a href="index.html">Início</a>
+    <a href="cadastro.html">Cadastrar Funcionário</a>
+    <a href="ativos.html">Funcionários Ativos</a>
+  </header>
+
+  <main>
+    <h1>Funcionários Ativos</h1>
+    <label for="ordenar">Ordenar por:</label>
     <select id="ordenar">
       <option value="nome">Nome (A-Z)</option>
-      <option value="data">Data de Cadastro (Mais recente)</option>
+      <option value="data">Data de Admissão (Mais recente)</option>
     </select>
-  </label>
-  <table>
-    <thead>
-      <tr><th>Nome</th><th>CPF</th><th>Local</th><th>Ações</th></tr>
-    </thead>
-    <tbody id="tabelaAtivos"></tbody>
-  </table>
-</main>
 
-<script>
-  let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
-  const tabela = document.getElementById('tabelaAtivos');
-  const ordenarSelect = document.getElementById('ordenar');
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Local</th>
+          <th>Data de Admissão</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabela">
+        <!-- Funcionários serão listados aqui -->
+      </tbody>
+    </table>
+  </main>
 
-  function salvar() {
-    localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
-  }
+  <script>
+    function carregarFuncionarios() {
+      let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
 
-  function renderizar() {
-    tabela.innerHTML = '';
-    funcionarios.forEach((f, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input value="${f.nome}" data-index="${i}" class="edit-nome" /></td>
-        <td><input value="${f.cpf}" data-index="${i}" class="edit-cpf" /></td>
-        <td><input value="${f.local}" data-index="${i}" class="edit-local" /></td>
-        <td>
-          <button onclick="excluir(${i})">Excluir</button>
-        </td>
-      `;
-      tabela.appendChild(tr);
-    });
-  }
+      const ordenar = document.getElementById('ordenar').value;
+      if (ordenar === 'nome') {
+        funcionarios.sort((a, b) => a.nome.localeCompare(b.nome));
+      } else {
+        funcionarios.sort((a, b) => new Date(b.admissao) - new Date(a.admissao));
+      }
 
-  function excluir(i) {
-    funcionarios.splice(i, 1);
-    salvar();
-    renderizar();
-  }
+      const tabela = document.getElementById('tabela');
+      tabela.innerHTML = '';
 
-  tabela.addEventListener('input', e => {
-    const index = e.target.dataset.index;
-    const campo = e.target.classList.contains('edit-nome') ? 'nome' :
-                  e.target.classList.contains('edit-cpf') ? 'cpf' :
-                  e.target.classList.contains('edit-local') ? 'local' : '';
-    if (campo) {
-      funcionarios[index][campo] = e.target.value;
-      salvar();
+      funcionarios.forEach((func, index) => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>${func.nome}</td>
+          <td>${func.cpf}</td>
+          <td>${func.local}</td>
+          <td>${func.admissao}</td>
+          <td>
+            <button onclick="editar(${index})">Editar</button>
+            <button onclick="excluir(${index})">Excluir</button>
+          </td>
+        `;
+        tabela.appendChild(tr);
+      });
     }
-  });
 
-  ordenarSelect.addEventListener('change', () => {
-    if (ordenarSelect.value === 'nome') {
-      funcionarios.sort((a, b) => a.nome.localeCompare(b.nome));
-    } else {
-      funcionarios.sort((a, b) => new Date(b.data) - new Date(a.data));
+    function excluir(index) {
+      let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
+      funcionarios.splice(index, 1);
+      localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+      carregarFuncionarios();
     }
-    renderizar();
-  });
 
-  renderizar();
-</script>
+    function editar(index) {
+      let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
+      const funcionario = funcionarios[index];
+
+      const novoNome = prompt("Editar nome:", funcionario.nome);
+      const novoCpf = prompt("Editar CPF:", funcionario.cpf);
+      const novoLocal = prompt("Editar local:", funcionario.local);
+      const novaAdmissao = prompt("Editar data de admissão:", funcionario.admissao);
+
+      if (novoNome && novoCpf && novoLocal && novaAdmissao) {
+        funcionarios[index] = {
+          nome: novoNome,
+          cpf: novoCpf,
+          local: novoLocal,
+          admissao: novaAdmissao
+        };
+        localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+        carregarFuncionarios();
+      }
+    }
+
+    document.getElementById('ordenar').addEventListener('change', carregarFuncionarios);
+
+    window.onload = carregarFuncionarios;
+  </script>
 </body>
 </html>

@@ -80,6 +80,7 @@
       <input type="text" id="nome" placeholder="Nome completo" required />
       <input type="text" id="cpf" placeholder="CPF" required />
       <input type="text" id="local" placeholder="Local de trabalho" required />
+      <input type="date" id="admissao" required />
       <button type="submit">Cadastrar</button>
       <div id="mensagem"></div>
     </form>
@@ -92,27 +93,24 @@
       const nome = document.getElementById('nome').value.trim();
       const cpf = document.getElementById('cpf').value.trim();
       const local = document.getElementById('local').value.trim();
-      const data = new Date().toISOString();
+      const admissao = document.getElementById('admissao').value;
 
-      if (!nome || !cpf || !local) {
+      if (!nome || !cpf || !local || !admissao) {
         document.getElementById('mensagem').textContent = 'Preencha todos os campos!';
         return;
       }
 
-      const funcionario = { nome, cpf, local, data };
+      const funcionario = { nome, cpf, local, admissao };
 
-      // Salva no localStorage
+      // Salvar no localStorage
       let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
       funcionarios.push(funcionario);
       localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
 
-      // Mensagem sem travar
+      // Mensagem
       document.getElementById('mensagem').textContent = 'Funcionário cadastrado com sucesso!';
-
-      // Limpa o formulário
       document.getElementById('formCadastro').reset();
 
-      // Limpa mensagem depois de 2 segundos
       setTimeout(() => {
         document.getElementById('mensagem').textContent = '';
       }, 2000);

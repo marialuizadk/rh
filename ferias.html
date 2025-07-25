@@ -1,48 +1,246 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Lançar Férias</title>
-<link rel="stylesheet" href="style.css" />
-<script src="menu.js" defer></script>
+  <meta charset="UTF-8" />
+  <title>Lançar Férias</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9d5ec;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background-color: #f06292;
+      padding: 10px 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    header a {
+      text-decoration: none;
+      background-color: #fff;
+      color: #f06292;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    header a:hover {
+      background-color: #f8bbd0;
+    }
+
+    main {
+      background-color: white;
+      margin-top: 40px;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #f06292;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input, select, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 100%;
+    }
+
+    button {
+      background-color: #f06292;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ec407a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+    }
+
+    .actions button {
+      margin: 0 5px;
+      background-color: #f06292;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .actions button:hover {
+      background-color: #e91e63;
+    }
+
+    .sort-container {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .sort-container select {
+      max-width: 200px;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
+  <header>
+    <a href="index.html">Início</a>
+    <a href="cadastrar.html">Cadastrar Funcionário</a>
+    <a href="ativos.html">Funcionários Ativos</a>
+    <a href="inativos.html">Funcionários Inativos</a>
+    <a href="ferias.html">Lançar Férias</a>
+    <a href="demissao.html">Registrar Demissão</a>
+    <a href="aviso.html">Aviso Prévio</a>
+    <a href="relatorio.html">Gerar Relatório</a>
+  </header>
+
+  <main>
     <h1>Lançar Férias</h1>
-    <form id="formFerias">
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" required />
-      <label for="cpf">CPF:</label>
-      <input type="text" id="cpf" required />
-      <label for="dataInicio">Data Início:</label>
-      <input type="date" id="dataInicio" required />
-      <label for="dataFim">Data Fim:</label>
-      <input type="date" id="dataFim" required />
-      <button type="submit">Registrar Férias</button>
+    <form id="feriasForm">
+      <input type="text" id="nome" placeholder="Nome do Funcionário" required>
+      <input type="date" id="dataInicio" required>
+      <input type="date" id="dataFim" required>
+      <select id="tipo">
+        <option value="normal">Férias Normais</option>
+        <option value="vencidas">Férias Vencidas</option>
+      </select>
+      <button type="submit">Salvar Férias</button>
     </form>
-  </div>
+
+    <div class="sort-container">
+      <select id="ordenar">
+        <option value="nome">Ordenar por Nome (A-Z)</option>
+        <option value="data">Ordenar por Data (Mais recente)</option>
+      </select>
+    </div>
+
+    <table id="tabelaFerias">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Início</th>
+          <th>Fim</th>
+          <th>Tipo</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
 
   <script>
-    document.getElementById('formFerias').addEventListener('submit', e => {
-      e.preventDefault();
-      const nome = document.getElementById('nome').value.trim();
-      const cpf = document.getElementById('cpf').value.trim();
-      const dataInicio = document.getElementById('dataInicio').value;
-      const dataFim = document.getElementById('dataFim').value;
+    const form = document.getElementById('feriasForm');
+    const tabela = document.querySelector('#tabelaFerias tbody');
+    const ordenar = document.getElementById('ordenar');
+    let listaFerias = JSON.parse(localStorage.getItem('ferias')) || [];
+    let editandoIndex = -1;
 
-      if (!nome || !cpf || !dataInicio || !dataFim) {
-        alert('Preencha todos os campos!');
-        return;
+    function salvarDados() {
+      localStorage.setItem('ferias', JSON.stringify(listaFerias));
+      mostrarTabela();
+    }
+
+    function mostrarTabela() {
+      tabela.innerHTML = '';
+      let lista = [...listaFerias];
+
+      if (ordenar.value === 'nome') {
+        lista.sort((a, b) => a.nome.localeCompare(b.nome));
+      } else {
+        lista.sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
       }
 
-      let ferias = JSON.parse(localStorage.getItem('ferias')) || [];
-      ferias.push({ nome, cpf, dataInicio: new Date(dataInicio).toISOString(), dataFim: new Date(dataFim).toISOString() });
-      localStorage.setItem('ferias', JSON.stringify(ferias));
+      lista.forEach((f, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${f.nome}</td>
+          <td>${f.dataInicio}</td>
+          <td>${f.dataFim}</td>
+          <td>${f.tipo}</td>
+          <td class="actions">
+            <button onclick="editar(${i})">Editar</button>
+            <button onclick="excluir(${i})">Excluir</button>
+          </td>
+        `;
+        tabela.appendChild(tr);
+      });
+    }
 
-      alert('Férias registradas com sucesso!');
-      e.target.reset();
+    function editar(index) {
+      const ferias = listaFerias[index];
+      document.getElementById('nome').value = ferias.nome;
+      document.getElementById('dataInicio').value = ferias.dataInicio;
+      document.getElementById('dataFim').value = ferias.dataFim;
+      document.getElementById('tipo').value = ferias.tipo;
+      editandoIndex = index;
+    }
+
+    function excluir(index) {
+      listaFerias.splice(index, 1);
+      salvarDados();
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const dataInicio = document.getElementById('dataInicio').value;
+      const dataFim = document.getElementById('dataFim').value;
+      const tipo = document.getElementById('tipo').value;
+
+      if (editandoIndex > -1) {
+        listaFerias[editandoIndex] = { nome, dataInicio, dataFim, tipo };
+        editandoIndex = -1;
+      } else {
+        listaFerias.push({ nome, dataInicio, dataFim, tipo });
+      }
+
+      form.reset();
+      salvarDados();
     });
+
+    ordenar.addEventListener('change', mostrarTabela);
+
+    mostrarTabela();
   </script>
 </body>
 </html>

@@ -1,175 +1,268 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Aviso Prévio</title>
-<link rel="stylesheet" href="style.css" />
-<script src="menu.js" defer></script>
+  <meta charset="UTF-8">
+  <title>Aviso Prévio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9d5ec;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background-color: #f06292;
+      padding: 10px 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    header a {
+      text-decoration: none;
+      background-color: #fff;
+      color: #f06292;
+      font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    header a:hover {
+      background-color: #f8bbd0;
+    }
+
+    main {
+      background-color: white;
+      margin-top: 40px;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #f06292;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input, button, label {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 100%;
+    }
+
+    button {
+      background-color: #f06292;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ec407a;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+    }
+
+    .actions button {
+      margin: 0 5px;
+      background-color: #f06292;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .actions button:hover {
+      background-color: #e91e63;
+    }
+
+    .sort-container {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .sort-container select {
+      max-width: 200px;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: start;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      width: auto;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Aviso Prévio</h1>
+  <header>
+    <a href="index.html">Início</a>
+    <a href="cadastrar.html">Cadastrar Funcionário</a>
+    <a href="ativos.html">Funcionários Ativos</a>
+    <a href="inativos.html">Funcionários Inativos</a>
+    <a href="ferias.html">Lançar Férias</a>
+    <a href="demissao.html">Registrar Demissão</a>
+    <a href="aviso.html">Aviso Prévio</a>
+    <a href="relatorio.html">Gerar Relatório</a>
+  </header>
 
-    <form id="formAviso">
-      <label for="nome">Nome:</label>
-      <input type="text" id="nome" required />
-      <label for="cpf">CPF:</label>
-      <input type="text" id="cpf" required />
-      <label for="dataInicio">Data Início:</label>
-      <input type="date" id="dataInicio" required />
-      <label for="dataFim">Data Fim:</label>
-      <input type="date" id="dataFim" readonly />
-      <label for="local">Local:</label>
-      <input type="text" id="local" required />
-      <button type="submit">Registrar Aviso</button>
+  <main>
+    <h1>Aviso Prévio</h1>
+    <form id="avisoForm">
+      <input type="text" id="nome" placeholder="Nome do Funcionário" required>
+      <input type="text" id="cpf" placeholder="CPF" required>
+      <input type="date" id="dataInicio" required>
+      <input type="date" id="dataFim" required>
+      <div class="checkbox-container">
+        <input type="checkbox" id="reduzirSeteDias">
+        <label for="reduzirSeteDias">Reduzir 7 dias do aviso prévio</label>
+      </div>
+      <button type="submit">Salvar Aviso</button>
     </form>
 
-    <div class="sort-container" style="margin-top:30px;">
-      <label for="ordenarAviso">Ordenar por:</label>
-      <select id="ordenarAviso">
-        <option value="nome">Nome (A-Z)</option>
-        <option value="dataInicio">Data Início (Mais recente)</option>
+    <div class="sort-container">
+      <select id="ordenar">
+        <option value="nome">Ordenar por Nome (A-Z)</option>
+        <option value="data">Ordenar por Início (Mais recente)</option>
       </select>
     </div>
 
-    <table id="tabelaAviso">
+    <table id="tabelaAvisos">
       <thead>
         <tr>
-          <th>Nome</th><th>CPF</th><th>Data Início</th><th>Data Fim</th><th>Local</th><th>Ações</th>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Início</th>
+          <th>Término</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-  </div>
+  </main>
 
   <script>
-    function formatDateISOtoBR(isoStr) {
-      const d = new Date(isoStr);
-      return d.toLocaleDateString('pt-BR');
+    const form = document.getElementById('avisoForm');
+    const tabela = document.querySelector('#tabelaAvisos tbody');
+    const ordenar = document.getElementById('ordenar');
+    let listaAvisos = JSON.parse(localStorage.getItem('avisos')) || [];
+    let editandoIndex = -1;
+
+    function salvarDados() {
+      localStorage.setItem('avisos', JSON.stringify(listaAvisos));
+      mostrarTabela();
     }
 
-    const dataInicioInput = document.getElementById('dataInicio');
-    const dataFimInput = document.getElementById('dataFim');
+    function mostrarTabela() {
+      tabela.innerHTML = '';
+      let lista = [...listaAvisos];
 
-    dataInicioInput.addEventListener('change', () => {
-      if (dataInicioInput.value) {
-        const data = new Date(dataInicioInput.value);
-        data.setDate(data.getDate() + 7); // soma 7 dias para fim do aviso
-        const yyyy = data.getFullYear();
-        const mm = String(data.getMonth() + 1).padStart(2, '0');
-        const dd = String(data.getDate()).padStart(2, '0');
-        dataFimInput.value = `${yyyy}-${mm}-${dd}`;
+      if (ordenar.value === 'nome') {
+        lista.sort((a, b) => a.nome.localeCompare(b.nome));
       } else {
-        dataFimInput.value = '';
+        lista.sort((a, b) => new Date(b.dataInicio) - new Date(a.dataInicio));
       }
-    });
 
-    function ordenarLista(lista, criterio) {
-      if (criterio === 'nome') {
-        return lista.sort((a,b) => a.nome.localeCompare(b.nome));
-      }
-      if (criterio === 'dataInicio') {
-        return lista.sort((a,b) => new Date(b.dataInicio) - new Date(a.dataInicio));
-      }
-      return lista;
-    }
-
-    function carregarAviso() {
-      const lista = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
-      const tbody = document.querySelector('#tabelaAviso tbody');
-      const criterio = document.getElementById('ordenarAviso').value;
-      const listaOrdenada = ordenarLista(lista, criterio);
-
-      tbody.innerHTML = '';
-      listaOrdenada.forEach((f, idx) => {
+      lista.forEach((aviso, i) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${f.nome}</td>
-          <td>${f.cpf}</td>
-          <td>${formatDateISOtoBR(f.dataInicio)}</td>
-          <td>${formatDateISOtoBR(f.dataFim)}</td>
-          <td>${f.local}</td>
+          <td>${aviso.nome}</td>
+          <td>${aviso.cpf}</td>
+          <td>${aviso.dataInicio}</td>
+          <td>${aviso.dataFim}</td>
           <td class="actions">
-            <button class="edit" onclick="editarAviso(${idx})">Editar</button>
-            <button class="delete" onclick="excluirAviso(${idx})">Excluir</button>
+            <button onclick="editar(${i})">Editar</button>
+            <button onclick="excluir(${i})">Excluir</button>
           </td>
         `;
-        tbody.appendChild(tr);
+        tabela.appendChild(tr);
       });
     }
 
-    document.getElementById('formAviso').addEventListener('submit', e => {
-      e.preventDefault();
-      const nome = document.getElementById('nome').value.trim();
-      const cpf = document.getElementById('cpf').value.trim();
-      const dataInicio = document.getElementById('dataInicio').value;
-      const dataFim = document.getElementById('dataFim').value;
-      const local = document.getElementById('local').value.trim();
+    function editar(index) {
+      const aviso = listaAvisos[index];
+      document.getElementById('nome').value = aviso.nome;
+      document.getElementById('cpf').value = aviso.cpf;
+      document.getElementById('dataInicio').value = aviso.dataInicio;
+      document.getElementById('dataFim').value = aviso.dataFim;
+      editandoIndex = index;
+    }
 
-      if (!nome || !cpf || !dataInicio || !dataFim || !local) {
-        alert('Preencha todos os campos!');
-        return;
+    function excluir(index) {
+      listaAvisos.splice(index, 1);
+      salvarDados();
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const cpf = document.getElementById('cpf').value;
+      const dataInicio = document.getElementById('dataInicio').value;
+      let dataFim = document.getElementById('dataFim').value;
+      const reduzir = document.getElementById('reduzirSeteDias').checked;
+
+      // Aplica a redução de 7 dias se estiver marcado
+      if (reduzir) {
+        const fim = new Date(dataFim);
+        fim.setDate(fim.getDate() - 7);
+        dataFim = fim.toISOString().split('T')[0];
       }
 
-      let aviso = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
-      aviso.push({
-        nome,
-        cpf,
-        dataInicio: new Date(dataInicio).toISOString(),
-        dataFim: new Date(dataFim).toISOString(),
-        local
-      });
+      const aviso = { nome, cpf, dataInicio, dataFim };
 
-      localStorage.setItem('avisoPrevio', JSON.stringify(aviso));
-      alert('Aviso prévio registrado com sucesso!');
-      e.target.reset();
-      carregarAviso();
+      if (editandoIndex > -1) {
+        listaAvisos[editandoIndex] = aviso;
+        editandoIndex = -1;
+      } else {
+        listaAvisos.push(aviso);
+      }
+
+      form.reset();
+      salvarDados();
     });
 
-    function editarAviso(idx) {
-      let lista = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
-      const f = lista[idx];
-      if (!f) return alert('Registro não encontrado.');
+    ordenar.addEventListener('change', mostrarTabela);
 
-      const novoNome = prompt('Editar nome:', f.nome);
-      if (novoNome === null) return;
-      const novoCpf = prompt('Editar CPF:', f.cpf);
-      if (novoCpf === null) return;
-      const novaDataInicio = prompt('Editar data início (YYYY-MM-DD):', f.dataInicio.slice(0,10));
-      if (novaDataInicio === null) return;
-      const novaDataFim = prompt('Editar data fim (YYYY-MM-DD):', f.dataFim.slice(0,10));
-      if (novaDataFim === null) return;
-      const novoLocal = prompt('Editar local:', f.local);
-      if (novoLocal === null) return;
-
-      if (!novoNome.trim() || !novoCpf.trim() || !novaDataInicio.trim() || !novaDataFim.trim() || !novoLocal.trim()) {
-        alert('Campos não podem ficar vazios.');
-        return;
-      }
-
-      lista[idx] = {
-        nome: novoNome.trim(),
-        cpf: novoCpf.trim(),
-        dataInicio: new Date(novaDataInicio).toISOString(),
-        dataFim: new Date(novaDataFim).toISOString(),
-        local: novoLocal.trim()
-      };
-
-      localStorage.setItem('avisoPrevio', JSON.stringify(lista));
-      carregarAviso();
-    }
-
-    function excluirAviso(idx) {
-      if (!confirm('Confirma exclusão do registro?')) return;
-      let lista = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
-      lista.splice(idx, 1);
-      localStorage.setItem('avisoPrevio', JSON.stringify(lista));
-      carregarAviso();
-    }
-
-    document.getElementById('ordenarAviso').addEventListener('change', carregarAviso);
-    window.onload = carregarAviso;
+    mostrarTabela();
   </script>
 </body>
 </html>

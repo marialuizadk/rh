@@ -1,28 +1,117 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Funcionários Inativos</title>
-<link rel="stylesheet" href="style.css" />
-<script src="menu.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Funcionários Inativos</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #ffe6f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      background-color: #ff66b2;
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    nav a {
+      background-color: white;
+      color: #ff66b2;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      background-color: #ffe6f0;
+    }
+
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 30px;
+      width: 90%;
+      max-width: 800px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #ffb3d9;
+    }
+
+    button {
+      margin: 5px;
+      padding: 5px 10px;
+      border: none;
+      background-color: #ff66b2;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ff3385;
+    }
+
+    .sort {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
+  <nav>
+    <a href="index.html">Início</a>
+    <a href="cadastro.html">Cadastrar Funcionário</a>
+    <a href="ativos.html">Funcionários Ativos</a>
+    <a href="inativos.html">Funcionários Inativos</a>
+    <a href="ferias.html">Lançar Férias</a>
+    <a href="demissao.html">Registrar Demissão</a>
+    <a href="aviso.html">Aviso Prévio</a>
+    <a href="relatorio.html">Gerar Relatório</a>
+  </nav>
   <div class="container">
     <h1>Funcionários Inativos</h1>
-
-    <div class="sort-container">
-      <label for="ordenarInativos">Ordenar por:</label>
-      <select id="ordenarInativos">
+    <div class="sort">
+      <label>Ordenar por:</label>
+      <select id="ordenar" onchange="ordenarInativos()">
         <option value="nome">Nome (A-Z)</option>
-        <option value="dataDemissao">Data Demissão (Mais recente)</option>
+        <option value="data">Data de Demissão (Mais recente)</option>
       </select>
     </div>
-
     <table id="tabelaInativos">
       <thead>
         <tr>
-          <th>Nome</th><th>CPF</th><th>Data Demissão</th><th>Motivo</th><th>Local</th><th>Ações</th>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Data</th>
+          <th>Motivo</th>
+          <th>Local</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -30,86 +119,58 @@
   </div>
 
   <script>
-    function formatDateISOtoBR(isoStr) {
-      const d = new Date(isoStr);
-      return d.toLocaleDateString('pt-BR');
-    }
-
-    function ordenarLista(lista, criterio) {
-      if (criterio === 'nome') {
-        return lista.sort((a,b) => a.nome.localeCompare(b.nome));
-      }
-      if (criterio === 'dataDemissao') {
-        return lista.sort((a,b) => new Date(b.dataDemissao) - new Date(a.dataDemissao));
-      }
-      return lista;
-    }
-
     function carregarInativos() {
-      const lista = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
-      const tbody = document.querySelector('#tabelaInativos tbody');
-      const criterio = document.getElementById('ordenarInativos').value;
-      const listaOrdenada = ordenarLista(lista, criterio);
+      const lista = JSON.parse(localStorage.getItem("inativos")) || [];
+      const tbody = document.querySelector("#tabelaInativos tbody");
+      tbody.innerHTML = "";
 
-      tbody.innerHTML = '';
-      listaOrdenada.forEach((f, idx) => {
-        const tr = document.createElement('tr');
+      lista.forEach((item, index) => {
+        const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${f.nome}</td>
-          <td>${f.cpf}</td>
-          <td>${formatDateISOtoBR(f.dataDemissao)}</td>
-          <td>${f.motivo}</td>
-          <td>${f.local}</td>
-          <td class="actions">
-            <button class="edit" onclick="editarInativo(${idx})">Editar</button>
-            <button class="delete" onclick="excluirInativo(${idx})">Excluir</button>
+          <td>${item.nome}</td>
+          <td>${item.cpf}</td>
+          <td>${item.data}</td>
+          <td>${item.motivo}</td>
+          <td>${item.local}</td>
+          <td>
+            <button onclick="editar(${index})">Editar</button>
+            <button onclick="excluir(${index})">Excluir</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function editarInativo(idx) {
-      let lista = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
-      const f = lista[idx];
-      if (!f) return alert('Funcionário não encontrado.');
-
-      const novoNome = prompt('Editar nome:', f.nome);
-      if (novoNome === null) return;
-      const novoCpf = prompt('Editar CPF:', f.cpf);
-      if (novoCpf === null) return;
-      const novaData = prompt('Editar data demissão (YYYY-MM-DD):', f.dataDemissao.slice(0,10));
-      if (novaData === null) return;
-      const novoMotivo = prompt('Editar motivo:', f.motivo);
-      if (novoMotivo === null) return;
-      const novoLocal = prompt('Editar local:', f.local);
-      if (novoLocal === null) return;
-
-      if (!novoNome.trim() || !novoCpf.trim() || !novaData.trim() || !novoMotivo.trim() || !novoLocal.trim()) {
-        alert('Campos não podem ficar vazios.');
-        return;
+    function editar(index) {
+      const lista = JSON.parse(localStorage.getItem("inativos")) || [];
+      const item = lista[index];
+      const novoNome = prompt("Editar Nome:", item.nome);
+      if (novoNome !== null) {
+        item.nome = novoNome;
+        localStorage.setItem("inativos", JSON.stringify(lista));
+        carregarInativos();
       }
+    }
 
-      lista[idx] = {
-        nome: novoNome.trim(),
-        cpf: novoCpf.trim(),
-        dataDemissao: new Date(novaData).toISOString(),
-        motivo: novoMotivo.trim(),
-        local: novoLocal.trim()
-      };
-      localStorage.setItem('funcionariosInativos', JSON.stringify(lista));
+    function excluir(index) {
+      const lista = JSON.parse(localStorage.getItem("inativos")) || [];
+      lista.splice(index, 1);
+      localStorage.setItem("inativos", JSON.stringify(lista));
       carregarInativos();
     }
 
-    function excluirInativo(idx) {
-      if (!confirm('Confirma exclusão do funcionário?')) return;
-      let lista = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
-      lista.splice(idx, 1);
-      localStorage.setItem('funcionariosInativos', JSON.stringify(lista));
+    function ordenarInativos() {
+      const criterio = document.getElementById("ordenar").value;
+      const lista = JSON.parse(localStorage.getItem("inativos")) || [];
+      if (criterio === "nome") {
+        lista.sort((a, b) => a.nome.localeCompare(b.nome));
+      } else {
+        lista.sort((a, b) => new Date(b.data) - new Date(a.data));
+      }
+      localStorage.setItem("inativos", JSON.stringify(lista));
       carregarInativos();
     }
 
-    document.getElementById('ordenarInativos').addEventListener('change', carregarInativos);
     window.onload = carregarInativos;
   </script>
 </body>

@@ -1,143 +1,133 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Registrar Demissão</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
       font-family: Arial, sans-serif;
-      background-color: #f9d5ec;
-      min-height: 100vh;
+      background: #fce4ec;
+      margin: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-
-    header {
+    nav {
       width: 100%;
-      background-color: #f06292;
-      padding: 10px 0;
+      background: #f06292;
       display: flex;
       justify-content: center;
       gap: 10px;
+      padding: 10px 0;
       flex-wrap: wrap;
     }
-
-    header a {
-      text-decoration: none;
-      background-color: #fff;
-      color: #f06292;
-      font-weight: bold;
+    nav a {
+      color: white;
+      background: #ff66b2;
       padding: 10px 15px;
-      border-radius: 8px;
-      transition: 0.3s;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: bold;
     }
-
-    header a:hover {
-      background-color: #f8bbd0;
-    }
-
     main {
-      background-color: white;
+      background: white;
       margin-top: 40px;
       padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 20px;
+      max-width: 500px;
       width: 90%;
-      max-width: 700px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       text-align: center;
     }
-
-    h1 {
-      color: #f06292;
-      margin-bottom: 20px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    input, textarea, select, button {
+    input, textarea, button {
+      width: 100%;
       padding: 10px;
+      margin: 10px 0;
       border-radius: 8px;
       border: 1px solid #ccc;
-      width: 100%;
+      box-sizing: border-box;
     }
-
     button {
-      background-color: #f06292;
-      color: white;
+      background: #f06292;
       border: none;
+      color: white;
       font-weight: bold;
       cursor: pointer;
     }
-
     button:hover {
-      background-color: #ec407a;
+      background: #d81b60;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-      text-align: center;
-    }
-
-    .actions button {
-      margin: 0 5px;
-      background-color: #f06292;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .actions button:hover {
-      background-color: #e91e63;
-    }
-
-    .sort-container {
+    #msg {
+      color: green;
+      font-weight: bold;
       margin-top: 10px;
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .sort-container select {
-      max-width: 200px;
     }
   </style>
 </head>
 <body>
-  <header>
+  <nav>
     <a href="index.html">Início</a>
     <a href="cadastro.html">Cadastrar Funcionário</a>
     <a href="ativos.html">Funcionários Ativos</a>
     <a href="inativos.html">Funcionários Inativos</a>
-    <a href="ferias.html">Lançar Férias</a>
     <a href="demissao.html">Registrar Demissão</a>
-    <a href="aviso.html">Aviso Prévio</a>
-    <a href="relatorio.html">Gerar Relatório</a>
-  </header>
+  </nav>
 
   <main>
     <h1>Registrar Demissão</h1>
-    <form id="demissaoForm">
-      <input type="text" id="nome" placeholder="Nome do Funcionário" required>
-      <input type="text" id="cpf" placeholder="CPF" required>
-      <input type="date" id="data" required>
-      <inp
+    <form id="formDemissao">
+      <input type="text" id="nome" placeholder="Nome completo" required />
+      <input type="text" id="cpf" placeholder="CPF" required />
+      <input type="date" id="data" required />
+      <input type="text" id="local" placeholder="Local de trabalho" required />
+      <textarea id="motivo" placeholder="Motivo da demissão" rows="3" required></textarea>
+      <button type="submit">Registrar Demissão</button>
+    </form>
+    <div id="msg"></div>
+  </main>
+
+  <script>
+    const form = document.getElementById('formDemissao');
+    const msg = document.getElementById('msg');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value.trim();
+      const cpf = document.getElementById('cpf').value.trim();
+      const data = document.getElementById('data').value;
+      const local = document.getElementById('local').value.trim();
+      const motivo = document.getElementById('motivo').value.trim();
+
+      if (!nome || !cpf || !data || !local || !motivo) {
+        msg.textContent = 'Preencha todos os campos!';
+        msg.style.color = 'red';
+        return;
+      }
+
+      // Salvar demissão
+      let demissoes = JSON.parse(localStorage.getItem('demissoes')) || [];
+      const demissao = { nome, cpf, data, local, motivo };
+      demissoes.push(demissao);
+      localStorage.setItem('demissoes', JSON.stringify(demissoes));
+
+      // Adicionar automaticamente em inativos
+      let inativos = JSON.parse(localStorage.getItem('inativos')) || [];
+
+      // Verifica se já não está na lista de inativos (evita duplicação)
+      const existe = inativos.some(f => f.cpf === cpf);
+      if (!existe) {
+        inativos.push({ nome, cpf, data, local, motivo });
+        localStorage.setItem('inativos', JSON.stringify(inativos));
+      }
+
+      msg.textContent = 'Demissão registrada e funcionário movido para inativos!';
+      msg.style.color = 'green';
+
+      form.reset();
+
+      // Pode redirecionar ou atualizar página se quiser
+    });
+  </script>
+</body>
+</html>

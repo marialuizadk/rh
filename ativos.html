@@ -1,288 +1,95 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<title>Funcionários Ativos</title>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    font-family: Arial, sans-serif;
-    background:#f9d5ec;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
-  header {
-    width: 100%;
-    background:#f06292;
-    padding: 10px 0;
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    flex-wrap: wrap;
-  }
-  header a {
-    text-decoration:none;
-    background:#fff;
-    color:#f06292;
-    font-weight:bold;
-    padding:10px 15px;
-    border-radius:8px;
-    transition:0.3s;
-  }
-  header a:hover {
-    background:#f8bbd0;
-  }
-  main {
-    background:#fff;
-    margin-top:40px;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 0 10px rgba(0,0,0,0.1);
-    width:90%;
-    max-width:700px;
-    text-align:center;
-    flex-grow:1;
-  }
-  h1 {
-    color:#f06292;
-    margin-bottom:20px;
-  }
-  form {
-    margin-bottom: 20px;
-    display:flex;
-    gap:10px;
-    justify-content:center;
-    flex-wrap: wrap;
-  }
-  input {
-    padding:10px;
-    border-radius:8px;
-    border:1px solid #ccc;
-    width: 150px;
-  }
-  button {
-    background:#f06292;
-    color:#fff;
-    font-weight:bold;
-    border:none;
-    padding:10px 15px;
-    border-radius:8px;
-    cursor:pointer;
-    transition: background-color 0.3s;
-  }
-  button:hover {
-    background:#d81b60;
-  }
-  .btn-ordenar {
-    background: #f8bbd0;
-    color: #f06292;
-    font-weight: bold;
-    padding: 6px 12px;
-    border-radius: 8px;
-  }
-  table {
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
-  }
-  th, td {
-    border:1px solid #ccc;
-    padding:10px;
-  }
-  td button {
-    margin: 0 3px;
-    background:#f06292;
-    color:#fff;
-    border:none;
-    padding:5px 8px;
-    border-radius:5px;
-    cursor:pointer;
-    transition: background-color 0.3s;
-  }
-  td button:hover {
-    background:#d81b60;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Funcionários Ativos</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f9d5ec; display:flex; flex-direction:column; align-items:center; min-height:100vh; margin:0; }
+    header { width:100%; background:#f06292; padding:10px 0; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+    header a { text-decoration:none; background:#fff; color:#f06292; font-weight:bold; padding:10px 15px; border-radius:8px; transition:0.3s; }
+    header a:hover { background:#f8bbd0; }
+    main { background:#fff; margin-top:40px; padding:30px; border-radius:15px; box-shadow:0 0 10px rgba(0,0,0,0.1); width:90%; max-width:800px; text-align:center; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #ccc; padding:10px; }
+    button { background:#f06292; color:#fff; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin:2px; }
+    button:hover { background:#d81b60; }
+    select { margin-bottom: 15px; padding: 5px; }
+  </style>
 </head>
 <body>
 <header>
   <a href="index.html">Início</a>
   <a href="cadastro.html">Cadastrar Funcionário</a>
   <a href="ativos.html">Funcionários Ativos</a>
-  <a href="inativos.html">Funcionários Inativos</a>
-  <a href="ferias.html">Lançar Férias</a>
-  <a href="demissao.html">Registrar Demissão</a>
-  <a href="aviso.html">Aviso Prévio</a>
-  <a href="relatorio.html">Gerar Relatório</a>
 </header>
 <main>
   <h1>Funcionários Ativos</h1>
-
-  <div style="margin-bottom:15px;">
-    <button class="btn-ordenar" id="ordenarNome">Ordenar por Nome (A-Z)</button>
-    <button class="btn-ordenar" id="ordenarData">Ordenar por Data (Mais recentes)</button>
-  </div>
-
-  <form id="formEditar" style="display:none;" autocomplete="off">
-    <input type="text" id="nomeEditar" placeholder="Nome" required />
-    <input type="text" id="cpfEditar" placeholder="CPF" required />
-    <button type="submit">Salvar Alterações</button>
-    <button type="button" id="btnCancelar">Cancelar</button>
-  </form>
-
+  <label>Ordenar por: 
+    <select id="ordenar">
+      <option value="nome">Nome (A-Z)</option>
+      <option value="data">Data de Cadastro (Mais recente)</option>
+    </select>
+  </label>
   <table>
     <thead>
-      <tr>
-        <th>Nome</th>
-        <th>CPF</th>
-        <th>Data Cadastro</th>
-        <th>Ações</th>
-      </tr>
+      <tr><th>Nome</th><th>CPF</th><th>Local</th><th>Ações</th></tr>
     </thead>
     <tbody id="tabelaAtivos"></tbody>
   </table>
 </main>
+
 <script>
-  (() => {
-    const tabela = document.getElementById('tabelaAtivos');
-    const formEditar = document.getElementById('formEditar');
-    const nomeEditar = document.getElementById('nomeEditar');
-    const cpfEditar = document.getElementById('cpfEditar');
-    const btnCancelar = document.getElementById('btnCancelar');
-    const btnOrdenarNome = document.getElementById('ordenarNome');
-    const btnOrdenarData = document.getElementById('ordenarData');
+  let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
+  const tabela = document.getElementById('tabelaAtivos');
+  const ordenarSelect = document.getElementById('ordenar');
 
-    let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
-    let indexEditando = null;
-    let ordemAtual = 'data'; // padrão: mostrar mais recentes primeiro
+  function salvar() {
+    localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+  }
 
-    // Salva no localStorage
-    function salvarLocalStorage() {
-      localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
-    }
-
-    // Renderiza tabela
-    function renderizarTabela() {
-      tabela.innerHTML = '';
-
-      // Ordena conforme ordemAtual
-      let listaExibir = [...funcionarios];
-      if (ordemAtual === 'nome') {
-        listaExibir.sort((a,b) => a.nome.localeCompare(b.nome));
-      } else {
-        // ordena por data cadastrada (mais recente primeiro)
-        listaExibir.sort((a,b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
-      }
-
-      listaExibir.forEach((func, idx) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${func.nome}</td>
-          <td>${func.cpf}</td>
-          <td>${func.dataCadastro ? new Date(func.dataCadastro).toLocaleDateString() : ''}</td>
-          <td>
-            <button data-index="${idx}" class="btn-editar">Editar</button>
-            <button data-index="${idx}" class="btn-excluir">Excluir</button>
-          </td>
-        `;
-        tabela.appendChild(tr);
-      });
-    }
-
-    // Mostra formulário de edição
-    function mostrarFormularioEdicao(idx) {
-      // idx é no array ordenado, precisamos o índice real no funcionarios
-      let listaOrdenada = [...funcionarios];
-      if (ordemAtual === 'nome') {
-        listaOrdenada.sort((a,b) => a.nome.localeCompare(b.nome));
-      } else {
-        listaOrdenada.sort((a,b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
-      }
-      const funcParaEditar = listaOrdenada[idx];
-
-      // Encontrar índice real no array original
-      indexEditando = funcionarios.findIndex(f => f.dataCadastro === funcParaEditar.dataCadastro && f.cpf === funcParaEditar.cpf && f.nome === funcParaEditar.nome);
-      if (indexEditando === -1) {
-        alert('Erro ao localizar funcionário para editar.');
-        return;
-      }
-
-      nomeEditar.value = funcParaEditar.nome;
-      cpfEditar.value = funcParaEditar.cpf;
-      formEditar.style.display = 'flex';
-      nomeEditar.focus();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Cancela edição
-    function cancelarEdicao() {
-      formEditar.style.display = 'none';
-      indexEditando = null;
-      formEditar.reset();
-    }
-
-    // Evento clique na tabela (delegação)
-    tabela.addEventListener('click', (e) => {
-      if (e.target.classList.contains('btn-editar')) {
-        const idx = Number(e.target.dataset.index);
-        mostrarFormularioEdicao(idx);
-      } else if (e.target.classList.contains('btn-excluir')) {
-        const idx = Number(e.target.dataset.index);
-        // exclui direto, sem confirmação, pra evitar travar
-        // Identificar funcionário real para excluir
-        let listaOrdenada = [...funcionarios];
-        if (ordemAtual === 'nome') {
-          listaOrdenada.sort((a,b) => a.nome.localeCompare(b.nome));
-        } else {
-          listaOrdenada.sort((a,b) => new Date(b.dataCadastro) - new Date(a.dataCadastro));
-        }
-        const funcParaExcluir = listaOrdenada[idx];
-
-        const realIdx = funcionarios.findIndex(f => f.dataCadastro === funcParaExcluir.dataCadastro && f.cpf === funcParaExcluir.cpf && f.nome === funcParaExcluir.nome);
-        if (realIdx !== -1) {
-          funcionarios.splice(realIdx,1);
-          salvarLocalStorage();
-          renderizarTabela();
-          if(indexEditando === realIdx) cancelarEdicao();
-        }
-      }
+  function renderizar() {
+    tabela.innerHTML = '';
+    funcionarios.forEach((f, i) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input value="${f.nome}" data-index="${i}" class="edit-nome" /></td>
+        <td><input value="${f.cpf}" data-index="${i}" class="edit-cpf" /></td>
+        <td><input value="${f.local}" data-index="${i}" class="edit-local" /></td>
+        <td>
+          <button onclick="excluir(${i})">Excluir</button>
+        </td>
+      `;
+      tabela.appendChild(tr);
     });
+  }
 
-    // Salvar edição
-    formEditar.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (indexEditando === null) return;
+  function excluir(i) {
+    funcionarios.splice(i, 1);
+    salvar();
+    renderizar();
+  }
 
-      const nome = nomeEditar.value.trim();
-      const cpf = cpfEditar.value.trim();
-      if (!nome || !cpf) return alert('Preencha todos os campos!');
+  tabela.addEventListener('input', e => {
+    const index = e.target.dataset.index;
+    const campo = e.target.classList.contains('edit-nome') ? 'nome' :
+                  e.target.classList.contains('edit-cpf') ? 'cpf' :
+                  e.target.classList.contains('edit-local') ? 'local' : '';
+    if (campo) {
+      funcionarios[index][campo] = e.target.value;
+      salvar();
+    }
+  });
 
-      funcionarios[indexEditando].nome = nome;
-      funcionarios[indexEditando].cpf = cpf;
-      salvarLocalStorage();
-      renderizarTabela();
-      cancelarEdicao();
-    });
+  ordenarSelect.addEventListener('change', () => {
+    if (ordenarSelect.value === 'nome') {
+      funcionarios.sort((a, b) => a.nome.localeCompare(b.nome));
+    } else {
+      funcionarios.sort((a, b) => new Date(b.data) - new Date(a.data));
+    }
+    renderizar();
+  });
 
-    btnCancelar.addEventListener('click', cancelarEdicao);
-
-    // Ordenar por nome
-    btnOrdenarNome.addEventListener('click', () => {
-      ordemAtual = 'nome';
-      renderizarTabela();
-    });
-
-    // Ordenar por data
-    btnOrdenarData.addEventListener('click', () => {
-      ordemAtual = 'data';
-      renderizarTabela();
-    });
-
-    // Inicializa
-    renderizarTabela();
-  })();
+  renderizar();
 </script>
 </body>
 </html>

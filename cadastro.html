@@ -6,79 +6,64 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9d5ec;
+      margin: 0;
+      background: #fce4ec;
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 0;
-      padding-bottom: 50px;
     }
     header {
-      background: #f06292;
       width: 100%;
-      padding: 15px 0;
+      background: #f06292;
+      padding: 10px;
       display: flex;
       justify-content: center;
-      flex-wrap: wrap;
       gap: 10px;
+      flex-wrap: wrap;
     }
     header a {
-      text-decoration: none;
-      color: #f06292;
       background: #fff;
-      padding: 10px 15px;
-      border-radius: 10px;
+      color: #f06292;
       font-weight: bold;
+      padding: 10px 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    header a:hover {
+      background: #f8bbd0;
     }
     main {
-      background: white;
       margin-top: 40px;
+      background: #fff;
       padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 20px;
       width: 90%;
-      max-width: 700px;
+      max-width: 500px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       text-align: center;
     }
-    input, select {
-      margin-bottom: 10px;
+    input, button {
+      width: 100%;
       padding: 10px;
-      width: 90%;
-      max-width: 400px;
-      border: 1px solid #ccc;
+      margin: 10px 0;
       border-radius: 8px;
+      border: 1px solid #ccc;
     }
     button {
       background: #f06292;
       color: white;
+      font-weight: bold;
       border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
       cursor: pointer;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-    }
-    .btn {
-      padding: 5px 10px;
-      background: #f06292;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .btn:hover {
+    button:hover {
       background: #d81b60;
     }
-    select#ordenar {
-      width: auto;
-      margin-bottom: 20px;
+    #mensagem {
+      margin-top: 10px;
+      color: green;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -87,104 +72,51 @@
     <a href="index.html">Início</a>
     <a href="cadastro.html">Cadastrar Funcionário</a>
     <a href="ativos.html">Funcionários Ativos</a>
-    <a href="inativos.html">Funcionários Inativos</a>
-    <a href="ferias.html">Lançar Férias</a>
-    <a href="demissao.html">Registrar Demissão</a>
-    <a href="aviso.html">Aviso Prévio</a>
-    <a href="relatorio.html">Gerar Relatório</a>
   </header>
 
   <main>
-    <h2>Cadastrar Funcionário</h2>
-    <input type="text" id="nome" placeholder="Nome do Funcionário" required><br>
-    <input type="text" id="cpf" placeholder="CPF" required><br>
-    <input type="text" id="local" placeholder="Local de Trabalho" required><br>
-    <button onclick="cadastrar()">Salvar</button>
-
-    <h3>Funcionários Cadastrados</h3>
-
-    <label for="ordenar">Ordenar por:</label>
-    <select id="ordenar" onchange="ordenar()">
-      <option value="nome">Nome (A-Z)</option>
-      <option value="data">Data (Mais Recentes)</option>
-    </select>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>CPF</th>
-          <th>Local</th>
-          <th>Data</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="lista"></tbody>
-    </table>
+    <h1>Cadastrar Funcionário</h1>
+    <form id="formCadastro">
+      <input type="text" id="nome" placeholder="Nome completo" required />
+      <input type="text" id="cpf" placeholder="CPF" required />
+      <input type="text" id="local" placeholder="Local de trabalho" required />
+      <button type="submit">Cadastrar</button>
+      <div id="mensagem"></div>
+    </form>
   </main>
 
   <script>
-    let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
+    document.getElementById('formCadastro').addEventListener('submit', function (e) {
+      e.preventDefault();
 
-    function salvarDados() {
-      localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
-    }
-
-    function cadastrar() {
       const nome = document.getElementById('nome').value.trim();
       const cpf = document.getElementById('cpf').value.trim();
       const local = document.getElementById('local').value.trim();
       const data = new Date().toISOString();
 
-      if (!nome || !cpf || !local) return alert('Preencha todos os campos.');
-
-      funcionarios.push({ nome, cpf, local, data });
-      salvarDados();
-      renderizar();
-      document.getElementById('nome').value = '';
-      document.getElementById('cpf').value = '';
-      document.getElementById('local').value = '';
-    }
-
-    function renderizar() {
-      const lista = document.getElementById('lista');
-      lista.innerHTML = '';
-
-      funcionarios.forEach((f, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="text" value="${f.nome}" onchange="editarCampo(${index}, 'nome', this.value)"></td>
-          <td><input type="text" value="${f.cpf}" onchange="editarCampo(${index}, 'cpf', this.value)"></td>
-          <td><input type="text" value="${f.local}" onchange="editarCampo(${index}, 'local', this.value)"></td>
-          <td>${new Date(f.data).toLocaleDateString()}</td>
-          <td><button class="btn" onclick="excluir(${index})">Excluir</button></td>
-        `;
-        lista.appendChild(tr);
-      });
-    }
-
-    function excluir(index) {
-      funcionarios.splice(index, 1);
-      salvarDados();
-      renderizar();
-    }
-
-    function editarCampo(index, campo, valor) {
-      funcionarios[index][campo] = valor;
-      salvarDados();
-    }
-
-    function ordenar() {
-      const tipo = document.getElementById('ordenar').value;
-      if (tipo === 'nome') {
-        funcionarios.sort((a, b) => a.nome.localeCompare(b.nome));
-      } else if (tipo === 'data') {
-        funcionarios.sort((a, b) => new Date(b.data) - new Date(a.data));
+      if (!nome || !cpf || !local) {
+        document.getElementById('mensagem').textContent = 'Preencha todos os campos!';
+        return;
       }
-      renderizar();
-    }
 
-    renderizar();
+      const funcionario = { nome, cpf, local, data };
+
+      // Salva no localStorage
+      let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
+      funcionarios.push(funcionario);
+      localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
+
+      // Mensagem sem travar
+      document.getElementById('mensagem').textContent = 'Funcionário cadastrado com sucesso!';
+
+      // Limpa o formulário
+      document.getElementById('formCadastro').reset();
+
+      // Limpa mensagem depois de 2 segundos
+      setTimeout(() => {
+        document.getElementById('mensagem').textContent = '';
+      }, 2000);
+    });
   </script>
 </body>
 </html>

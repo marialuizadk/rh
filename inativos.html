@@ -8,54 +8,131 @@
       background-color: #ffe6f0;
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
-    }
-    nav {
+      padding: 0 10px;
       display: flex;
       justify-content: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
       background-color: #ff66b2;
-      padding: 10px;
+      padding: 10px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      z-index: 100;
+      box-sizing: border-box;
     }
     nav a {
       color: white;
-      margin: 0 10px;
+      margin: 5px 10px;
       text-decoration: none;
       font-weight: bold;
       background-color: #ff99cc;
       padding: 10px 15px;
       border-radius: 10px;
+      transition: background-color 0.3s ease;
+    }
+    nav a:hover {
+      background-color: #ffb3d9;
     }
     .container {
-      max-width: 800px;
-      margin: 30px auto;
+      margin-top: 70px; /* espaço para o nav fixo */
+      max-width: 900px;
+      width: 100%;
       background: white;
-      padding: 20px;
+      padding: 25px 20px;
       border-radius: 15px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+      overflow-x: auto;
+    }
+    h2 {
+      margin-top: 0;
+      text-align: center;
+      color: #f06292;
+    }
+    label, select {
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: block;
+      text-align: center;
+    }
+    select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin: 0 auto 20px auto;
+      display: inline-block;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 15px;
+      min-width: 600px;
+      table-layout: auto;
     }
     th, td {
-      padding: 10px;
+      padding: 12px 10px;
       border: 1px solid #ddd;
       text-align: center;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+    th {
+      background: #f8bbd0;
+      color: #4a0033;
+      font-weight: 700;
+    }
+    input[type="text"],
+    input[type="date"] {
+      width: 90%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      box-sizing: border-box;
     }
     button {
       background-color: #ff66b2;
       color: white;
       border: none;
-      padding: 5px 10px;
-      margin: 2px;
-      border-radius: 5px;
+      padding: 6px 14px;
+      margin: 0 2px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      font-size: 13px;
     }
-    select {
-      margin-top: 10px;
-      padding: 5px;
-      border-radius: 5px;
+    button:hover {
+      background-color: #e65597;
+    }
+    /* Responsividade simples */
+    @media (max-width: 700px) {
+      .container {
+        padding: 15px 10px;
+        margin-top: 80px;
+      }
+      table {
+        font-size: 12px;
+        min-width: 500px;
+      }
+      input[type="text"],
+      input[type="date"] {
+        width: 100%;
+      }
+      button {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+      nav a {
+        padding: 8px 10px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -128,7 +205,7 @@
       const dados = JSON.parse(localStorage.getItem("inativos")) || [];
       dados[index][campo] = valor;
       localStorage.setItem("inativos", JSON.stringify(dados));
-      carregarInativos(); // atualiza visual
+      carregarInativos();
     }
 
     function excluir(index) {

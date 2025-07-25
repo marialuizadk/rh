@@ -4,42 +4,34 @@
   <meta charset="UTF-8" />
   <title>Cadastrar Funcionário</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: Arial, sans-serif;
-      background-color: #f9d5ec;
+      background: #f9d5ec;
       display: flex;
       flex-direction: column;
       align-items: center;
+      margin: 0;
+      padding-bottom: 50px;
     }
-
     header {
+      background: #f06292;
       width: 100%;
-      background-color: #f06292;
-      padding: 10px 0;
+      padding: 15px 0;
       display: flex;
       justify-content: center;
-      gap: 10px;
       flex-wrap: wrap;
+      gap: 10px;
     }
-
     header a {
       text-decoration: none;
-      background-color: #fff;
       color: #f06292;
-      font-weight: bold;
+      background: #fff;
       padding: 10px 15px;
-      border-radius: 8px;
-      transition: 0.3s;
+      border-radius: 10px;
+      font-weight: bold;
     }
-
-    header a:hover {
-      background-color: #f8bbd0;
-    }
-
     main {
-      background-color: white;
+      background: white;
       margin-top: 40px;
       padding: 30px;
       border-radius: 15px;
@@ -48,74 +40,52 @@
       max-width: 700px;
       text-align: center;
     }
-
-    h1 {
-      color: #f06292;
-      margin-bottom: 20px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
     input, select {
+      margin-bottom: 10px;
       padding: 10px;
-      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
       border: 1px solid #ccc;
-    }
-
-    button {
-      background-color: #f06292;
-      color: white;
-      font-weight: bold;
-      border: none;
-      padding: 10px;
       border-radius: 8px;
+    }
+    button {
+      background: #f06292;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
       cursor: pointer;
     }
-
-    button:hover {
-      background-color: #ec407a;
-    }
-
-    .ordem {
-      margin-bottom: 10px;
-      text-align: right;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 20px;
     }
-
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
     }
-
-    td button {
-      margin: 0 3px;
-      background-color: #f06292;
+    .btn {
+      padding: 5px 10px;
+      background: #f06292;
       color: #fff;
       border: none;
-      padding: 5px 8px;
       border-radius: 5px;
       cursor: pointer;
     }
-
-    td button:hover {
-      background-color: #d81b60;
+    .btn:hover {
+      background: #d81b60;
+    }
+    select#ordenar {
+      width: auto;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
   <header>
     <a href="index.html">Início</a>
-    <a href="cadastrar.html">Cadastrar Funcionário</a>
+    <a href="cadastro.html">Cadastrar Funcionário</a>
     <a href="ativos.html">Funcionários Ativos</a>
     <a href="inativos.html">Funcionários Inativos</a>
     <a href="ferias.html">Lançar Férias</a>
@@ -125,114 +95,96 @@
   </header>
 
   <main>
-    <h1>Cadastrar Funcionário</h1>
-    <form id="formFuncionario">
-      <input type="text" id="nome" placeholder="Nome" required>
-      <input type="text" id="cpf" placeholder="CPF" required>
-      <button type="submit">Salvar</button>
-    </form>
+    <h2>Cadastrar Funcionário</h2>
+    <input type="text" id="nome" placeholder="Nome do Funcionário" required><br>
+    <input type="text" id="cpf" placeholder="CPF" required><br>
+    <input type="text" id="local" placeholder="Local de Trabalho" required><br>
+    <button onclick="cadastrar()">Salvar</button>
 
-    <div class="ordem">
-      <label for="ordenar">Ordenar por:</label>
-      <select id="ordenar">
-        <option value="data">Data de Cadastro (Recente)</option>
-        <option value="nome">Nome (A-Z)</option>
-      </select>
-    </div>
+    <h3>Funcionários Cadastrados</h3>
 
-    <table id="tabelaFuncionarios">
+    <label for="ordenar">Ordenar por:</label>
+    <select id="ordenar" onchange="ordenar()">
+      <option value="nome">Nome (A-Z)</option>
+      <option value="data">Data (Mais Recentes)</option>
+    </select>
+
+    <table>
       <thead>
         <tr>
           <th>Nome</th>
           <th>CPF</th>
+          <th>Local</th>
+          <th>Data</th>
           <th>Ações</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="lista"></tbody>
     </table>
   </main>
 
   <script>
-    const form = document.getElementById('formFuncionario');
-    const nomeInput = document.getElementById('nome');
-    const cpfInput = document.getElementById('cpf');
-    const tabela = document.querySelector('#tabelaFuncionarios tbody');
-    const ordenarSelect = document.getElementById('ordenar');
-
     let funcionarios = JSON.parse(localStorage.getItem('funcionarios')) || [];
-    let editandoCPF = null;
 
-    function salvarFuncionarios() {
+    function salvarDados() {
       localStorage.setItem('funcionarios', JSON.stringify(funcionarios));
-      renderizarTabela();
     }
 
-    function renderizarTabela() {
-      let lista = [...funcionarios];
-      const ordem = ordenarSelect.value;
+    function cadastrar() {
+      const nome = document.getElementById('nome').value.trim();
+      const cpf = document.getElementById('cpf').value.trim();
+      const local = document.getElementById('local').value.trim();
+      const data = new Date().toISOString();
 
-      if (ordem === 'nome') {
-        lista.sort((a, b) => a.nome.localeCompare(b.nome));
-      } else {
-        lista.sort((a, b) => new Date(b.data) - new Date(a.data));
-      }
+      if (!nome || !cpf || !local) return alert('Preencha todos os campos.');
 
-      tabela.innerHTML = '';
-      lista.forEach(func => {
+      funcionarios.push({ nome, cpf, local, data });
+      salvarDados();
+      renderizar();
+      document.getElementById('nome').value = '';
+      document.getElementById('cpf').value = '';
+      document.getElementById('local').value = '';
+    }
+
+    function renderizar() {
+      const lista = document.getElementById('lista');
+      lista.innerHTML = '';
+
+      funcionarios.forEach((f, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${func.nome}</td>
-          <td>${func.cpf}</td>
-          <td>
-            <button onclick="editarFuncionario('${func.cpf}')">Editar</button>
-            <button onclick="excluirFuncionario('${func.cpf}')">Excluir</button>
-          </td>
+          <td><input type="text" value="${f.nome}" onchange="editarCampo(${index}, 'nome', this.value)"></td>
+          <td><input type="text" value="${f.cpf}" onchange="editarCampo(${index}, 'cpf', this.value)"></td>
+          <td><input type="text" value="${f.local}" onchange="editarCampo(${index}, 'local', this.value)"></td>
+          <td>${new Date(f.data).toLocaleDateString()}</td>
+          <td><button class="btn" onclick="excluir(${index})">Excluir</button></td>
         `;
-        tabela.appendChild(tr);
+        lista.appendChild(tr);
       });
     }
 
-    function editarFuncionario(cpf) {
-      const func = funcionarios.find(f => f.cpf === cpf);
-      if (func) {
-        nomeInput.value = func.nome;
-        cpfInput.value = func.cpf;
-        editandoCPF = cpf;
-      }
+    function excluir(index) {
+      funcionarios.splice(index, 1);
+      salvarDados();
+      renderizar();
     }
 
-    function excluirFuncionario(cpf) {
-      funcionarios = funcionarios.filter(f => f.cpf !== cpf);
-      salvarFuncionarios();
+    function editarCampo(index, campo, valor) {
+      funcionarios[index][campo] = valor;
+      salvarDados();
     }
 
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      const nome = nomeInput.value.trim();
-      const cpf = cpfInput.value.trim();
-
-      if (!nome || !cpf) return;
-
-      if (editandoCPF) {
-        const index = funcionarios.findIndex(f => f.cpf === editandoCPF);
-        if (index !== -1) {
-          funcionarios[index] = { nome, cpf, data: funcionarios[index].data };
-        }
-        editandoCPF = null;
-      } else {
-        funcionarios.push({ nome, cpf, data: new Date().toISOString() });
+    function ordenar() {
+      const tipo = document.getElementById('ordenar').value;
+      if (tipo === 'nome') {
+        funcionarios.sort((a, b) => a.nome.localeCompare(b.nome));
+      } else if (tipo === 'data') {
+        funcionarios.sort((a, b) => new Date(b.data) - new Date(a.data));
       }
+      renderizar();
+    }
 
-      form.reset();
-      salvarFuncionarios();
-    });
-
-    ordenarSelect.addEventListener('change', renderizarTabela);
-
-    window.editarFuncionario = editarFuncionario;
-    window.excluirFuncionario = excluirFuncionario;
-
-    renderizarTabela();
+    renderizar();
   </script>
 </body>
 </html>

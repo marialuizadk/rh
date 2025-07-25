@@ -1,234 +1,116 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Funcionários Inativos</title>
-<style>
-  *{margin:0; padding:0; box-sizing:border-box;}
-  html, body {
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background: #fff0f6;
-    color: #4a2a4a;
-  }
-  body {
-    display: flex; flex-direction: column; min-height: 100vh;
-  }
-  header {
-    background: #fff;
-    box-shadow: 0 2px 6px rgba(214,51,108,0.3);
-    padding: 10px 0;
-  }
-  nav ul {
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    list-style: none;
-    font-weight: 600;
-  }
-  nav a {
-    text-decoration: none;
-    color: #d6336c;
-    font-size: 1.1rem;
-    padding: 8px 15px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-  }
-  nav a:hover, nav a:focus {
-    background-color: #a02947;
-    color: white;
-    outline: none;
-  }
-  main {
-    flex: 1;
-    margin: 20px auto 40px;
-    background: white;
-    padding: 30px 25px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(214,51,108,0.25);
-    max-width: 700px;
-    width: 90%;
-  }
-  h1 {
-    color: #d6336c;
-    font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-  th, td {
-    border: 1px solid #d6336c;
-    padding: 10px;
-    text-align: left;
-  }
-  th {
-    background: #f8cbd0;
-  }
-  td.actions {
-    text-align: center;
-  }
-  td.actions button {
-    background: #d6336c;
-    border: none;
-    color: white;
-    padding: 7px 12px;
-    margin-right: 5px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background-color 0.3s ease;
-  }
-  td.actions button:hover {
-    background: #a02947;
-  }
-  .sort-buttons {
-    margin-bottom: 15px;
-    text-align: right;
-  }
-  .sort-buttons button {
-    background: #d6336c;
-    border: none;
-    color: white;
-    padding: 6px 10px;
-    margin-left: 5px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 0.9rem;
-    transition: background-color 0.3s ease;
-  }
-  .sort-buttons button:hover {
-    background: #a02947;
-  }
-</style>
+<link rel="stylesheet" href="style.css" />
+<script src="menu.js" defer></script>
 </head>
 <body>
-<header>
-  <nav>
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
-      <li><a href="ferias.html">Lançar Férias</a></li>
-      <li><a href="demissao.html">Registrar Demissão</a></li>
-      <li><a href="aviso.html">Aviso Prévio</a></li>
-      <li><a href="ativos.html">Funcionários Ativos</a></li>
-      <li><a href="inativos.html">Funcionários Inativos</a></li>
-      <li><a href="relatorio.html">Gerar Relatório</a></li>
-    </ul>
-  </nav>
-</header>
-<main>
-  <h1>Funcionários Inativos</h1>
+  <div class="container">
+    <h1>Funcionários Inativos</h1>
 
-  <div class="sort-buttons">
-    <span>Ordenar por:</span>
-    <button onclick="ordenarPorNome()">Nome (A-Z)</button>
-    <button onclick="ordenarPorData()">Data Demissão (Mais recente)</button>
+    <div class="sort-container">
+      <label for="ordenarInativos">Ordenar por:</label>
+      <select id="ordenarInativos">
+        <option value="nome">Nome (A-Z)</option>
+        <option value="dataDemissao">Data Demissão (Mais recente)</option>
+      </select>
+    </div>
+
+    <table id="tabelaInativos">
+      <thead>
+        <tr>
+          <th>Nome</th><th>CPF</th><th>Data Demissão</th><th>Motivo</th><th>Local</th><th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
-  <table id="tabelaInativos">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>CPF</th>
-        <th>Data Demissão</th>
-        <th>Motivo</th>
-        <th>Local</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</main>
-
-<script>
-  function getInativos() {
-    return JSON.parse(localStorage.getItem('funcionariosInativos') || '[]');
-  }
-  function salvarInativos(inativos) {
-    localStorage.setItem('funcionariosInativos', JSON.stringify(inativos));
-  }
-  function carregarInativos() {
-    const inativos = getInativos();
-    const tbody = document.querySelector('#tabelaInativos tbody');
-    tbody.innerHTML = '';
-    inativos.forEach((f,i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${f.nome}</td>
-        <td>${f.cpf}</td>
-        <td>${f.dataDemissao}</td>
-        <td>${f.motivo}</td>
-        <td>${f.local}</td>
-        <td class="actions">
-          <button onclick="editarInativo(${i})">Editar</button>
-          <button onclick="removerInativo(${i})">Excluir</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function editarInativo(i) {
-    let inativos = getInativos();
-    const f = inativos[i];
-    const novoNome = prompt('Editar nome:', f.nome);
-    if(novoNome === null) return;
-    const novoCpf = prompt('Editar CPF:', f.cpf);
-    if(novoCpf === null) return;
-    const novaData = prompt('Editar data (AAAA-MM-DD):', f.dataDemissao);
-    if(novaData === null) return;
-    const novoMotivo = prompt('Editar motivo:', f.motivo);
-    if(novoMotivo === null) return;
-    const novoLocal = prompt('Editar local:', f.local);
-    if(novoLocal === null) return;
-
-    if(!novoNome.trim() || !novoCpf.trim() || !novaData.trim() || !novoMotivo.trim() || !novoLocal.trim()) {
-      alert('Campos não podem ficar vazios!');
-      return;
+  <script>
+    function formatDateISOtoBR(isoStr) {
+      const d = new Date(isoStr);
+      return d.toLocaleDateString('pt-BR');
     }
 
-    inativos[i] = {
-      nome: novoNome.trim(),
-      cpf: novoCpf.trim(),
-      dataDemissao: novaData.trim(),
-      motivo: novoMotivo.trim(),
-      local: novoLocal.trim()
-    };
-    salvarInativos(inativos);
-    carregarInativos();
-  }
+    function ordenarLista(lista, criterio) {
+      if (criterio === 'nome') {
+        return lista.sort((a,b) => a.nome.localeCompare(b.nome));
+      }
+      if (criterio === 'dataDemissao') {
+        return lista.sort((a,b) => new Date(b.dataDemissao) - new Date(a.dataDemissao));
+      }
+      return lista;
+    }
 
-  function removerInativo(i) {
-    if(!confirm('Confirma exclusão do funcionário inativo?')) return;
-    let inativos = getInativos();
-    inativos.splice(i,1);
-    salvarInativos(inativos);
-    carregarInativos();
-  }
+    function carregarInativos() {
+      const lista = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+      const tbody = document.querySelector('#tabelaInativos tbody');
+      const criterio = document.getElementById('ordenarInativos').value;
+      const listaOrdenada = ordenarLista(lista, criterio);
 
-  function ordenarPorNome() {
-    let inativos = getInativos();
-    inativos.sort((a,b) => a.nome.localeCompare(b.nome));
-    salvarInativos(inativos);
-    carregarInativos();
-  }
-  function ordenarPorData() {
-    let inativos = getInativos();
-    inativos.sort((a,b) => new Date(b.dataDemissao) - new Date(a.dataDemissao));
-    salvarInativos(inativos);
-    carregarInativos();
-  }
+      tbody.innerHTML = '';
+      listaOrdenada.forEach((f, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${f.nome}</td>
+          <td>${f.cpf}</td>
+          <td>${formatDateISOtoBR(f.dataDemissao)}</td>
+          <td>${f.motivo}</td>
+          <td>${f.local}</td>
+          <td class="actions">
+            <button class="edit" onclick="editarInativo(${idx})">Editar</button>
+            <button class="delete" onclick="excluirInativo(${idx})">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
-  carregarInativos();
-</script>
+    function editarInativo(idx) {
+      let lista = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+      const f = lista[idx];
+      if (!f) return alert('Funcionário não encontrado.');
+
+      const novoNome = prompt('Editar nome:', f.nome);
+      if (novoNome === null) return;
+      const novoCpf = prompt('Editar CPF:', f.cpf);
+      if (novoCpf === null) return;
+      const novaData = prompt('Editar data demissão (YYYY-MM-DD):', f.dataDemissao.slice(0,10));
+      if (novaData === null) return;
+      const novoMotivo = prompt('Editar motivo:', f.motivo);
+      if (novoMotivo === null) return;
+      const novoLocal = prompt('Editar local:', f.local);
+      if (novoLocal === null) return;
+
+      if (!novoNome.trim() || !novoCpf.trim() || !novaData.trim() || !novoMotivo.trim() || !novoLocal.trim()) {
+        alert('Campos não podem ficar vazios.');
+        return;
+      }
+
+      lista[idx] = {
+        nome: novoNome.trim(),
+        cpf: novoCpf.trim(),
+        dataDemissao: new Date(novaData).toISOString(),
+        motivo: novoMotivo.trim(),
+        local: novoLocal.trim()
+      };
+      localStorage.setItem('funcionariosInativos', JSON.stringify(lista));
+      carregarInativos();
+    }
+
+    function excluirInativo(idx) {
+      if (!confirm('Confirma exclusão do funcionário?')) return;
+      let lista = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+      lista.splice(idx, 1);
+      localStorage.setItem('funcionariosInativos', JSON.stringify(lista));
+      carregarInativos();
+    }
+
+    document.getElementById('ordenarInativos').addEventListener('change', carregarInativos);
+    window.onload = carregarInativos;
+  </script>
 </body>
 </html>

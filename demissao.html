@@ -1,376 +1,67 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Registrar Demissão</title>
-<style>
-  *{margin:0; padding:0; box-sizing:border-box;}
-  html, body {
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background: #fff0f6;
-    color: #4a2a4a;
-  }
-  body {
-    display: flex; flex-direction: column; min-height: 100vh;
-  }
-  header {
-    background: #fff;
-    box-shadow: 0 2px 6px rgba(214,51,108,0.3);
-    padding: 10px 0;
-  }
-  nav ul {
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    list-style: none;
-    font-weight: 600;
-  }
-  nav a {
-    text-decoration: none;
-    color: #d6336c;
-    font-size: 1.1rem;
-    padding: 8px 15px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-  }
-  nav a:hover, nav a:focus {
-    background-color: #a02947;
-    color: white;
-    outline: none;
-  }
-  main {
-    flex: 1;
-    margin: 20px auto 40px;
-    background: white;
-    padding: 30px 25px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(214,51,108,0.25);
-    max-width: 600px;
-    width: 90%;
-  }
-  h1 {
-    color: #d6336c;
-    font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-  form label {
-    display: block;
-    margin-bottom: 15px;
-    font-weight: 600;
-  }
-  form input[type="text"],
-  form input[type="date"] {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1.8px solid #d6336c;
-    border-radius: 8px;
-    font-size: 1rem;
-    margin-top: 5px;
-  }
-  form textarea {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1.8px solid #d6336c;
-    border-radius: 8px;
-    font-size: 1rem;
-    margin-top: 5px;
-    resize: vertical;
-    min-height: 60px;
-  }
-  form button {
-    background: #d6336c;
-    color: white;
-    border: none;
-    padding: 14px 20px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    border-radius: 10px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
-  }
-  form button:hover,
-  form button:focus {
-    background-color: #a02947;
-    outline: none;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 30px;
-  }
-  th, td {
-    border: 1px solid #d6336c;
-    padding: 10px;
-    text-align: left;
-  }
-  th {
-    background: #f8cbd0;
-  }
-  td.actions {
-    text-align: center;
-  }
-  td.actions button {
-    background: #d6336c;
-    border: none;
-    color: white;
-    padding: 7px 12px;
-    margin-right: 5px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background-color 0.3s ease;
-  }
-  td.actions button:hover {
-    background: #a02947;
-  }
-  .sort-buttons {
-    margin-bottom: 15px;
-    text-align: right;
-  }
-  .sort-buttons button {
-    background: #d6336c;
-    border: none;
-    color: white;
-    padding: 6px 10px;
-    margin-left: 5px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 0.9rem;
-    transition: background-color 0.3s ease;
-  }
-  .sort-buttons button:hover {
-    background: #a02947;
-  }
-</style>
+<link rel="stylesheet" href="style.css" />
+<script src="menu.js" defer></script>
 </head>
 <body>
-<header>
-  <nav>
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
-      <li><a href="ferias.html">Lançar Férias</a></li>
-      <li><a href="demissao.html">Registrar Demissão</a></li>
-      <li><a href="aviso.html">Aviso Prévio</a></li>
-      <li><a href="ativos.html">Funcionários Ativos</a></li>
-      <li><a href="inativos.html">Funcionários Inativos</a></li>
-      <li><a href="relatorio.html">Gerar Relatório</a></li>
-    </ul>
-  </nav>
-</header>
-<main>
-  <h1>Registrar Demissão</h1>
-  <form id="formDemissao">
-    <label>
-      Nome do Funcionário:
+  <div class="container">
+    <h1>Registrar Demissão</h1>
+    <form id="formDemissao">
+      <label for="nome">Nome:</label>
       <input type="text" id="nome" required />
-    </label>
-    <label>
-      CPF:
+      <label for="cpf">CPF:</label>
       <input type="text" id="cpf" required />
-    </label>
-    <label>
-      Data da Demissão:
+      <label for="dataDemissao">Data da Demissão:</label>
       <input type="date" id="dataDemissao" required />
-    </label>
-    <label>
-      Motivo da Demissão:
-      <textarea id="motivo" required></textarea>
-    </label>
-    <label>
-      Local:
+      <label for="motivo">Motivo:</label>
+      <input type="text" id="motivo" required />
+      <label for="local">Local:</label>
       <input type="text" id="local" required />
-    </label>
-    <button type="submit">Registrar Demissão</button>
-  </form>
-
-  <div class="sort-buttons">
-    <span>Ordenar por:</span>
-    <button onclick="ordenarPorNome()">Nome (A-Z)</button>
-    <button onclick="ordenarPorData()">Data (Mais recente)</button>
+      <button type="submit">Registrar Demissão</button>
+    </form>
   </div>
 
-  <table id="tabelaDemissao">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>CPF</th>
-        <th>Data</th>
-        <th>Motivo</th>
-        <th>Local</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</main>
+  <script>
+    document.getElementById('formDemissao').addEventListener('submit', e => {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const cpf = document.getElementById('cpf').value.trim();
+      const dataDemissao = document.getElementById('dataDemissao').value;
+      const motivo = document.getElementById('motivo').value.trim();
+      const local = document.getElementById('local').value.trim();
 
-<script>
-  function getDemissoes() {
-    return JSON.parse(localStorage.getItem('demissoes') || '[]');
-  }
-  function salvarDemissoes(demissoes) {
-    localStorage.setItem('demissoes', JSON.stringify(demissoes));
-  }
-  function getAtivos() {
-    return JSON.parse(localStorage.getItem('funcionariosAtivos') || '[]');
-  }
-  function salvarAtivos(ativos) {
-    localStorage.setItem('funcionariosAtivos', JSON.stringify(ativos));
-  }
-  function getInativos() {
-    return JSON.parse(localStorage.getItem('funcionariosInativos') || '[]');
-  }
-  function salvarInativos(inativos) {
-    localStorage.setItem('funcionariosInativos', JSON.stringify(inativos));
-  }
+      if (!nome || !cpf || !dataDemissao || !motivo || !local) {
+        alert('Preencha todos os campos!');
+        return;
+      }
 
-  function carregarDemissoes() {
-    const demissoes = getDemissoes();
-    const tbody = document.querySelector('#tabelaDemissao tbody');
-    tbody.innerHTML = '';
-    demissoes.forEach((d, i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${d.nome}</td>
-        <td>${d.cpf}</td>
-        <td>${d.dataDemissao}</td>
-        <td>${d.motivo}</td>
-        <td>${d.local}</td>
-        <td class="actions">
-          <button onclick="editarDemissao(${i})">Editar</button>
-          <button onclick="removerDemissao(${i})">Excluir</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
+      // Remover da lista ativos (se existir)
+      let ativos = JSON.parse(localStorage.getItem('funcionariosAtivos')) || [];
+      const idxAtivo = ativos.findIndex(f => f.nome === nome && f.cpf === cpf);
+      if (idxAtivo !== -1) {
+        ativos.splice(idxAtivo, 1);
+        localStorage.setItem('funcionariosAtivos', JSON.stringify(ativos));
+      }
+
+      // Adicionar na lista inativos
+      let inativos = JSON.parse(localStorage.getItem('funcionariosInativos')) || [];
+      inativos.push({
+        nome,
+        cpf,
+        dataDemissao: new Date(dataDemissao).toISOString(),
+        motivo,
+        local
+      });
+      localStorage.setItem('funcionariosInativos', JSON.stringify(inativos));
+
+      alert('Demissão registrada com sucesso e funcionário movido para inativos!');
+      e.target.reset();
     });
-  }
-
-  document.getElementById('formDemissao').addEventListener('submit', e => {
-    e.preventDefault();
-    const nome = document.getElementById('nome').value.trim();
-    const cpf = document.getElementById('cpf').value.trim();
-    const dataDemissao = document.getElementById('dataDemissao').value;
-    const motivo = document.getElementById('motivo').value.trim();
-    const local = document.getElementById('local').value.trim();
-
-    if(!nome || !cpf || !dataDemissao || !motivo || !local) {
-      alert('Preencha todos os campos!');
-      return;
-    }
-
-    // Remover funcionário da lista de ativos, se existir
-    let ativos = getAtivos();
-    let indexAtivo = ativos.findIndex(f => f.nome === nome && f.cpf === cpf);
-    if(indexAtivo !== -1) {
-      ativos.splice(indexAtivo,1);
-      salvarAtivos(ativos);
-    }
-
-    // Adicionar na lista de inativos (se não estiver já)
-    let inativos = getInativos();
-    let jaInativo = inativos.some(f => f.nome === nome && f.cpf === cpf);
-    if(!jaInativo){
-      inativos.push({ nome, cpf, dataDemissao, motivo, local });
-      salvarInativos(inativos);
-    }
-
-    // Salvar demissão
-    let demissoes = getDemissoes();
-    demissoes.push({ nome, cpf, dataDemissao, motivo, local });
-    salvarDemissoes(demissoes);
-
-    e.target.reset();
-    carregarDemissoes();
-  });
-
-  function editarDemissao(i) {
-    let demissoes = getDemissoes();
-    const d = demissoes[i];
-    const novoNome = prompt('Editar nome:', d.nome);
-    if(novoNome === null) return;
-    const novoCpf = prompt('Editar CPF:', d.cpf);
-    if(novoCpf === null) return;
-    const novaData = prompt('Editar data (AAAA-MM-DD):', d.dataDemissao);
-    if(novaData === null) return;
-    const novoMotivo = prompt('Editar motivo:', d.motivo);
-    if(novoMotivo === null) return;
-    const novoLocal = prompt('Editar local:', d.local);
-    if(novoLocal === null) return;
-
-    if(!novoNome.trim() || !novoCpf.trim() || !novaData.trim() || !novoMotivo.trim() || !novoLocal.trim()) {
-      alert('Campos não podem ficar vazios!');
-      return;
-    }
-
-    demissoes[i] = {
-      nome: novoNome.trim(),
-      cpf: novoCpf.trim(),
-      dataDemissao: novaData.trim(),
-      motivo: novoMotivo.trim(),
-      local: novoLocal.trim()
-    };
-    salvarDemissoes(demissoes);
-
-    // Atualizar inativos também
-    let inativos = getInativos();
-    const indexInativo = inativos.findIndex(f => f.nome === d.nome && f.cpf === d.cpf);
-    if(indexInativo !== -1) {
-      inativos[indexInativo] = {
-        nome: novoNome.trim(),
-        cpf: novoCpf.trim(),
-        dataDemissao: novaData.trim(),
-        motivo: novoMotivo.trim(),
-        local: novoLocal.trim()
-      };
-      salvarInativos(inativos);
-    }
-
-    carregarDemissoes();
-  }
-
-  function removerDemissao(i) {
-    if(!confirm('Confirma exclusão da demissão?')) return;
-    let demissoes = getDemissoes();
-    const d = demissoes[i];
-    demissoes.splice(i,1);
-    salvarDemissoes(demissoes);
-
-    // Também remove da lista de inativos
-    let inativos = getInativos();
-    let indexInativo = inativos.findIndex(f => f.nome === d.nome && f.cpf === d.cpf);
-    if(indexInativo !== -1){
-      inativos.splice(indexInativo,1);
-      salvarInativos(inativos);
-    }
-
-    carregarDemissoes();
-  }
-
-  // Ordenações
-  function ordenarPorNome() {
-    let demissoes = getDemissoes();
-    demissoes.sort((a,b) => a.nome.localeCompare(b.nome));
-    salvarDemissoes(demissoes);
-    carregarDemissoes();
-  }
-  function ordenarPorData() {
-    let demissoes = getDemissoes();
-    demissoes.sort((a,b) => new Date(b.dataDemissao) - new Date(a.dataDemissao));
-    salvarDemissoes(demissoes);
-    carregarDemissoes();
-  }
-
-  carregarDemissoes();
-</script>
+  </script>
 </body>
 </html>
+

@@ -1,257 +1,48 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lançar Férias</title>
-<style>
-  *{margin:0; padding:0; box-sizing:border-box;}
-  html, body {
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background: #fff0f6;
-    color: #4a2a4a;
-  }
-  body {
-    display: flex; flex-direction: column; min-height: 100vh;
-  }
-  header {
-    background: #fff;
-    box-shadow: 0 2px 6px rgba(214,51,108,0.3);
-    padding: 10px 0;
-  }
-  nav ul {
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    list-style: none;
-    font-weight: 600;
-  }
-  nav a {
-    text-decoration: none;
-    color: #d6336c;
-    font-size: 1.1rem;
-    padding: 8px 15px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-  }
-  nav a:hover, nav a:focus {
-    background-color: #a02947;
-    color: white;
-    outline: none;
-  }
-  main {
-    flex: 1;
-    margin: 20px auto 40px;
-    background: white;
-    padding: 30px 25px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(214,51,108,0.25);
-    max-width: 600px;
-    width: 90%;
-  }
-  h1 {
-    color: #d6336c;
-    font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-  form label {
-    display: block;
-    margin-bottom: 15px;
-    font-weight: 600;
-  }
-  form input[type="text"],
-  form input[type="date"] {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1.8px solid #d6336c;
-    border-radius: 8px;
-    font-size: 1rem;
-    margin-top: 5px;
-  }
-  form button {
-    background: #d6336c;
-    color: white;
-    border: none;
-    padding: 14px 20px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    border-radius: 10px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
-  }
-  form button:hover,
-  form button:focus {
-    background-color: #a02947;
-    outline: none;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 30px;
-  }
-  th, td {
-    border: 1px solid #d6336c;
-    padding: 10px;
-    text-align: left;
-  }
-  th {
-    background: #f8cbd0;
-  }
-  td.actions {
-    text-align: center;
-  }
-  td.actions button {
-    background: #d6336c;
-    border: none;
-    color: white;
-    padding: 7px 12px;
-    margin-right: 5px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background-color 0.3s ease;
-  }
-  td.actions button:hover {
-    background: #a02947;
-  }
-</style>
+<link rel="stylesheet" href="style.css" />
+<script src="menu.js" defer></script>
 </head>
 <body>
-<header>
-  <nav>
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
-      <li><a href="ferias.html">Lançar Férias</a></li>
-      <li><a href="demissao.html">Registrar Demissão</a></li>
-      <li><a href="aviso.html">Aviso Prévio</a></li>
-      <li><a href="ativos.html">Funcionários Ativos</a></li>
-      <li><a href="inativos.html">Funcionários Inativos</a></li>
-      <li><a href="relatorio.html">Gerar Relatório</a></li>
-    </ul>
-  </nav>
-</header>
-<main>
-  <h1>Lançar Férias</h1>
-  <form id="formFerias">
-    <label>
-      Nome do Funcionário:
+  <div class="container">
+    <h1>Lançar Férias</h1>
+    <form id="formFerias">
+      <label for="nome">Nome:</label>
       <input type="text" id="nome" required />
-    </label>
-    <label>
-      Data Início:
+      <label for="cpf">CPF:</label>
+      <input type="text" id="cpf" required />
+      <label for="dataInicio">Data Início:</label>
       <input type="date" id="dataInicio" required />
-    </label>
-    <label>
-      Data Fim:
+      <label for="dataFim">Data Fim:</label>
       <input type="date" id="dataFim" required />
-    </label>
-    <button type="submit">Lançar Férias</button>
-  </form>
+      <button type="submit">Registrar Férias</button>
+    </form>
+  </div>
 
-  <table id="tabelaFerias">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Data Início</th>
-        <th>Data Fim</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</main>
+  <script>
+    document.getElementById('formFerias').addEventListener('submit', e => {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const cpf = document.getElementById('cpf').value.trim();
+      const dataInicio = document.getElementById('dataInicio').value;
+      const dataFim = document.getElementById('dataFim').value;
 
-<script>
-  function getFerias() {
-    return JSON.parse(localStorage.getItem('ferias') || '[]');
-  }
-  function salvarFerias(ferias) {
-    localStorage.setItem('ferias', JSON.stringify(ferias));
-  }
-  function carregarFerias() {
-    const ferias = getFerias();
-    const tbody = document.querySelector('#tabelaFerias tbody');
-    tbody.innerHTML = '';
-    ferias.forEach((f,i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${f.nome}</td>
-        <td>${f.dataInicio}</td>
-        <td>${f.dataFim}</td>
-        <td class="actions">
-          <button onclick="editarFerias(${i})">Editar</button>
-          <button onclick="removerFerias(${i})">Excluir</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
+      if (!nome || !cpf || !dataInicio || !dataFim) {
+        alert('Preencha todos os campos!');
+        return;
+      }
+
+      let ferias = JSON.parse(localStorage.getItem('ferias')) || [];
+      ferias.push({ nome, cpf, dataInicio: new Date(dataInicio).toISOString(), dataFim: new Date(dataFim).toISOString() });
+      localStorage.setItem('ferias', JSON.stringify(ferias));
+
+      alert('Férias registradas com sucesso!');
+      e.target.reset();
     });
-  }
-
-  document.getElementById('formFerias').addEventListener('submit', e => {
-    e.preventDefault();
-    const nome = document.getElementById('nome').value.trim();
-    const dataInicio = document.getElementById('dataInicio').value;
-    const dataFim = document.getElementById('dataFim').value;
-
-    if(!nome || !dataInicio || !dataFim) {
-      alert('Preencha todos os campos!');
-      return;
-    }
-
-    if(new Date(dataFim) < new Date(dataInicio)) {
-      alert('Data fim deve ser maior ou igual à data início!');
-      return;
-    }
-
-    let ferias = getFerias();
-    ferias.push({ nome, dataInicio, dataFim });
-    salvarFerias(ferias);
-
-    e.target.reset();
-    carregarFerias();
-  });
-
-  function editarFerias(i) {
-    let ferias = getFerias();
-    const f = ferias[i];
-    const novoNome = prompt('Editar nome:', f.nome);
-    if(novoNome === null) return;
-    const novaDataInicio = prompt('Editar data início (AAAA-MM-DD):', f.dataInicio);
-    if(novaDataInicio === null) return;
-    const novaDataFim = prompt('Editar data fim (AAAA-MM-DD):', f.dataFim);
-    if(novaDataFim === null) return;
-
-    if(!novoNome.trim() || !novaDataInicio.trim() || !novaDataFim.trim()) {
-      alert('Campos não podem ficar vazios!');
-      return;
-    }
-
-    ferias[i] = {
-      nome: novoNome.trim(),
-      dataInicio: novaDataInicio.trim(),
-      dataFim: novaDataFim.trim()
-    };
-    salvarFerias(ferias);
-    carregarFerias();
-  }
-
-  function removerFerias(i) {
-    if(!confirm('Confirma exclusão do registro de férias?')) return;
-    let ferias = getFerias();
-    ferias.splice(i,1);
-    salvarFerias(ferias);
-    carregarFerias();
-  }
-
-  carregarFerias();
-</script>
+  </script>
 </body>
 </html>

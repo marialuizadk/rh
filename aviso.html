@@ -1,267 +1,175 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Aviso Prévio</title>
-<style>
-  *{margin:0; padding:0; box-sizing:border-box;}
-  html, body {
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background: #fff0f6;
-    color: #4a2a4a;
-  }
-  body {
-    display: flex; flex-direction: column; min-height: 100vh;
-  }
-  header {
-    background: #fff;
-    box-shadow: 0 2px 6px rgba(214,51,108,0.3);
-    padding: 10px 0;
-  }
-  nav ul {
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    list-style: none;
-    font-weight: 600;
-  }
-  nav a {
-    text-decoration: none;
-    color: #d6336c;
-    font-size: 1.1rem;
-    padding: 8px 15px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-  }
-  nav a:hover, nav a:focus {
-    background-color: #a02947;
-    color: white;
-    outline: none;
-  }
-  main {
-    flex: 1;
-    margin: 20px auto 40px;
-    background: white;
-    padding: 30px 25px;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(214,51,108,0.25);
-    max-width: 600px;
-    width: 90%;
-  }
-  h1 {
-    color: #d6336c;
-    font-weight: 700;
-    font-size: 2rem;
-    margin-bottom: 30px;
-    text-align: center;
-  }
-  form label {
-    display: block;
-    margin-bottom: 15px;
-    font-weight: 600;
-  }
-  form input[type="text"],
-  form input[type="date"] {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1.8px solid #d6336c;
-    border-radius: 8px;
-    font-size: 1rem;
-    margin-top: 5px;
-  }
-  form button {
-    background: #d6336c;
-    color: white;
-    border: none;
-    padding: 14px 20px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    border-radius: 10px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
-  }
-  form button:hover,
-  form button:focus {
-    background-color: #a02947;
-    outline: none;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 30px;
-  }
-  th, td {
-    border: 1px solid #d6336c;
-    padding: 10px;
-    text-align: left;
-  }
-  th {
-    background: #f8cbd0;
-  }
-  td.actions {
-    text-align: center;
-  }
-  td.actions button {
-    background: #d6336c;
-    border: none;
-    color: white;
-    padding: 7px 12px;
-    margin-right: 5px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background-color 0.3s ease;
-  }
-  td.actions button:hover {
-    background: #a02947;
-  }
-</style>
+<link rel="stylesheet" href="style.css" />
+<script src="menu.js" defer></script>
 </head>
 <body>
-<header>
-  <nav>
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="cadastro.html">Cadastrar Funcionário</a></li>
-      <li><a href="ferias.html">Lançar Férias</a></li>
-      <li><a href="demissao.html">Registrar Demissão</a></li>
-      <li><a href="aviso.html">Aviso Prévio</a></li>
-      <li><a href="ativos.html">Funcionários Ativos</a></li>
-      <li><a href="inativos.html">Funcionários Inativos</a></li>
-      <li><a href="relatorio.html">Gerar Relatório</a></li>
-    </ul>
-  </nav>
-</header>
-<main>
-  <h1>Aviso Prévio</h1>
-  <form id="formAviso">
-    <label>
-      Nome do Funcionário:
+  <div class="container">
+    <h1>Aviso Prévio</h1>
+
+    <form id="formAviso">
+      <label for="nome">Nome:</label>
       <input type="text" id="nome" required />
-    </label>
-    <label>
-      Data Início:
+      <label for="cpf">CPF:</label>
+      <input type="text" id="cpf" required />
+      <label for="dataInicio">Data Início:</label>
       <input type="date" id="dataInicio" required />
-    </label>
-    <label>
-      Data Término (será reduzida em 7 dias automaticamente):
-      <input type="date" id="dataTermino" readonly />
-    </label>
-    <button type="submit">Registrar Aviso Prévio</button>
-  </form>
+      <label for="dataFim">Data Fim:</label>
+      <input type="date" id="dataFim" readonly />
+      <label for="local">Local:</label>
+      <input type="text" id="local" required />
+      <button type="submit">Registrar Aviso</button>
+    </form>
 
-  <table id="tabelaAviso">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Data Início</th>
-        <th>Data Término</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</main>
+    <div class="sort-container" style="margin-top:30px;">
+      <label for="ordenarAviso">Ordenar por:</label>
+      <select id="ordenarAviso">
+        <option value="nome">Nome (A-Z)</option>
+        <option value="dataInicio">Data Início (Mais recente)</option>
+      </select>
+    </div>
 
-<script>
-  function getAvisos() {
-    return JSON.parse(localStorage.getItem('avisoPrevio') || '[]');
-  }
-  function salvarAvisos(avisos) {
-    localStorage.setItem('avisoPrevio', JSON.stringify(avisos));
-  }
-  function carregarAvisos() {
-    const avisos = getAvisos();
-    const tbody = document.querySelector('#tabelaAviso tbody');
-    tbody.innerHTML = '';
-    avisos.forEach((a,i) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${a.nome}</td>
-        <td>${a.dataInicio}</td>
-        <td>${a.dataTermino}</td>
-        <td class="actions">
-          <button onclick="editarAviso(${i})">Editar</button>
-          <button onclick="removerAviso(${i})">Excluir</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
+    <table id="tabelaAviso">
+      <thead>
+        <tr>
+          <th>Nome</th><th>CPF</th><th>Data Início</th><th>Data Fim</th><th>Local</th><th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    function formatDateISOtoBR(isoStr) {
+      const d = new Date(isoStr);
+      return d.toLocaleDateString('pt-BR');
+    }
+
+    const dataInicioInput = document.getElementById('dataInicio');
+    const dataFimInput = document.getElementById('dataFim');
+
+    dataInicioInput.addEventListener('change', () => {
+      if (dataInicioInput.value) {
+        const data = new Date(dataInicioInput.value);
+        data.setDate(data.getDate() + 7); // soma 7 dias para fim do aviso
+        const yyyy = data.getFullYear();
+        const mm = String(data.getMonth() + 1).padStart(2, '0');
+        const dd = String(data.getDate()).padStart(2, '0');
+        dataFimInput.value = `${yyyy}-${mm}-${dd}`;
+      } else {
+        dataFimInput.value = '';
+      }
     });
-  }
 
-  function calcularDataTermino(dataInicio) {
-    if(!dataInicio) return '';
-    let dt = new Date(dataInicio);
-    dt.setDate(dt.getDate() + 30); // aviso prévio padrão 30 dias
-    dt.setDate(dt.getDate() - 7);  // reduz 7 dias
-    return dt.toISOString().split('T')[0];
-  }
-
-  const inputDataInicio = document.getElementById('dataInicio');
-  const inputDataTermino = document.getElementById('dataTermino');
-
-  inputDataInicio.addEventListener('change', () => {
-    inputDataTermino.value = calcularDataTermino(inputDataInicio.value);
-  });
-
-  document.getElementById('formAviso').addEventListener('submit', e => {
-    e.preventDefault();
-    const nome = document.getElementById('nome').value.trim();
-    const dataInicio = inputDataInicio.value;
-    const dataTermino = inputDataTermino.value;
-
-    if(!nome || !dataInicio || !dataTermino) {
-      alert('Preencha todos os campos!');
-      return;
+    function ordenarLista(lista, criterio) {
+      if (criterio === 'nome') {
+        return lista.sort((a,b) => a.nome.localeCompare(b.nome));
+      }
+      if (criterio === 'dataInicio') {
+        return lista.sort((a,b) => new Date(b.dataInicio) - new Date(a.dataInicio));
+      }
+      return lista;
     }
 
-    let avisos = getAvisos();
-    avisos.push({ nome, dataInicio, dataTermino });
-    salvarAvisos(avisos);
+    function carregarAviso() {
+      const lista = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
+      const tbody = document.querySelector('#tabelaAviso tbody');
+      const criterio = document.getElementById('ordenarAviso').value;
+      const listaOrdenada = ordenarLista(lista, criterio);
 
-    e.target.reset();
-    inputDataTermino.value = '';
-    carregarAvisos();
-  });
-
-  function editarAviso(i) {
-    let avisos = getAvisos();
-    const a = avisos[i];
-    const novoNome = prompt('Editar nome:', a.nome);
-    if(novoNome === null) return;
-    const novaDataInicio = prompt('Editar data início (AAAA-MM-DD):', a.dataInicio);
-    if(novaDataInicio === null) return;
-
-    if(!novoNome.trim() || !novaDataInicio.trim()) {
-      alert('Campos não podem ficar vazios!');
-      return;
+      tbody.innerHTML = '';
+      listaOrdenada.forEach((f, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${f.nome}</td>
+          <td>${f.cpf}</td>
+          <td>${formatDateISOtoBR(f.dataInicio)}</td>
+          <td>${formatDateISOtoBR(f.dataFim)}</td>
+          <td>${f.local}</td>
+          <td class="actions">
+            <button class="edit" onclick="editarAviso(${idx})">Editar</button>
+            <button class="delete" onclick="excluirAviso(${idx})">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    const novaDataTermino = calcularDataTermino(novaDataInicio.trim());
-    avisos[i] = {
-      nome: novoNome.trim(),
-      dataInicio: novaDataInicio.trim(),
-      dataTermino: novaDataTermino
-    };
-    salvarAvisos(avisos);
-    carregarAvisos();
-  }
+    document.getElementById('formAviso').addEventListener('submit', e => {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const cpf = document.getElementById('cpf').value.trim();
+      const dataInicio = document.getElementById('dataInicio').value;
+      const dataFim = document.getElementById('dataFim').value;
+      const local = document.getElementById('local').value.trim();
 
-  function removerAviso(i) {
-    if(!confirm('Confirma exclusão do aviso prévio?')) return;
-    let avisos = getAvisos();
-    avisos.splice(i,1);
-    salvarAvisos(avisos);
-    carregarAvisos();
-  }
+      if (!nome || !cpf || !dataInicio || !dataFim || !local) {
+        alert('Preencha todos os campos!');
+        return;
+      }
 
-  carregarAvisos();
-</script>
+      let aviso = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
+      aviso.push({
+        nome,
+        cpf,
+        dataInicio: new Date(dataInicio).toISOString(),
+        dataFim: new Date(dataFim).toISOString(),
+        local
+      });
+
+      localStorage.setItem('avisoPrevio', JSON.stringify(aviso));
+      alert('Aviso prévio registrado com sucesso!');
+      e.target.reset();
+      carregarAviso();
+    });
+
+    function editarAviso(idx) {
+      let lista = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
+      const f = lista[idx];
+      if (!f) return alert('Registro não encontrado.');
+
+      const novoNome = prompt('Editar nome:', f.nome);
+      if (novoNome === null) return;
+      const novoCpf = prompt('Editar CPF:', f.cpf);
+      if (novoCpf === null) return;
+      const novaDataInicio = prompt('Editar data início (YYYY-MM-DD):', f.dataInicio.slice(0,10));
+      if (novaDataInicio === null) return;
+      const novaDataFim = prompt('Editar data fim (YYYY-MM-DD):', f.dataFim.slice(0,10));
+      if (novaDataFim === null) return;
+      const novoLocal = prompt('Editar local:', f.local);
+      if (novoLocal === null) return;
+
+      if (!novoNome.trim() || !novoCpf.trim() || !novaDataInicio.trim() || !novaDataFim.trim() || !novoLocal.trim()) {
+        alert('Campos não podem ficar vazios.');
+        return;
+      }
+
+      lista[idx] = {
+        nome: novoNome.trim(),
+        cpf: novoCpf.trim(),
+        dataInicio: new Date(novaDataInicio).toISOString(),
+        dataFim: new Date(novaDataFim).toISOString(),
+        local: novoLocal.trim()
+      };
+
+      localStorage.setItem('avisoPrevio', JSON.stringify(lista));
+      carregarAviso();
+    }
+
+    function excluirAviso(idx) {
+      if (!confirm('Confirma exclusão do registro?')) return;
+      let lista = JSON.parse(localStorage.getItem('avisoPrevio')) || [];
+      lista.splice(idx, 1);
+      localStorage.setItem('avisoPrevio', JSON.stringify(lista));
+      carregarAviso();
+    }
+
+    document.getElementById('ordenarAviso').addEventListener('change', carregarAviso);
+    window.onload = carregarAviso;
+  </script>
 </body>
 </html>

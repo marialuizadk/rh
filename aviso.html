@@ -2,53 +2,50 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Aviso Prévio</title>
   <style>
     body {
-      background-color: #ffe6f0;
       font-family: Arial, sans-serif;
+      background: #fce4ec;
       margin: 0;
       padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    .nav {
+    header {
+      background: #f06292;
+      width: 100%;
       display: flex;
       justify-content: center;
       gap: 10px;
-      background-color: #ff99cc;
       padding: 10px;
-      width: 100%;
     }
-    .nav a {
-      text-decoration: none;
-      background-color: white;
-      color: #ff3399;
+    header a {
+      color: white;
+      background: #ec407a;
       padding: 10px 15px;
+      text-decoration: none;
       border-radius: 8px;
-      font-weight: bold;
-    }
-    h1 {
-      color: #cc0066;
-      margin-top: 20px;
     }
     .container {
       background: white;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       margin-top: 20px;
+      padding: 20px;
+      border-radius: 12px;
       width: 90%;
       max-width: 800px;
     }
-    input, select, button {
-      padding: 10px;
-      margin: 5px 0;
-      width: 100%;
-      border-radius: 8px;
+    input, button {
+      padding: 8px;
+      margin: 5px;
+      border-radius: 5px;
       border: 1px solid #ccc;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
     }
     table {
       width: 100%;
@@ -56,27 +53,20 @@
       border-collapse: collapse;
     }
     th, td {
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       padding: 10px;
-      text-align: left;
+      text-align: center;
     }
-    button {
-      background-color: #ff66b2;
+    .btn {
+      background-color: #f06292;
       color: white;
       border: none;
       cursor: pointer;
     }
-    .actions button {
-      width: auto;
-      margin-right: 5px;
-    }
-    .sort {
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
-  <div class="nav">
+  <header>
     <a href="index.html">Início</a>
     <a href="cadastro.html">Cadastrar Funcionário</a>
     <a href="ativos.html">Funcionários Ativos</a>
@@ -85,129 +75,111 @@
     <a href="demissao.html">Registrar Demissão</a>
     <a href="aviso.html">Aviso Prévio</a>
     <a href="relatorio.html">Gerar Relatório</a>
-  </div>
-  <h1>Aviso Prévio</h1>
+  </header>
+
   <div class="container">
-    <input type="text" id="nome" placeholder="Nome do Funcionário">
-    <input type="text" id="cpf" placeholder="CPF">
-    <input type="date" id="inicio">
-    <input type="date" id="fim">
-    <input type="text" id="motivo" placeholder="Motivo do Aviso">
-    <input type="text" id="local" placeholder="Local">
-    <button onclick="registrarAviso()">Registrar Aviso</button>
-    <div class="sort">
-      <select id="ordenar" onchange="listarAvisos()">
-        <option value="nome">Ordenar por Nome (A-Z)</option>
-        <option value="data">Ordenar por Data Mais Recente</option>
-      </select>
-    </div>
-    <table>
+    <h2>Registro de Aviso Prévio</h2>
+    <label>Nome: <input type="text" id="nome" /></label>
+    <label>CPF: <input type="text" id="cpf" /></label>
+    <label>Local: <input type="text" id="local" /></label>
+    <label>Data de Início: <input type="date" id="dataInicio" /></label>
+    <label>Redução de 7 dias? <input type="checkbox" id="reducao" /></label>
+    <label>Data de Término: <input type="date" id="dataTermino" /></label>
+    <button class="btn" onclick="registrarAviso()">Registrar</button>
+
+    <table id="tabelaAviso">
       <thead>
         <tr>
           <th>Nome</th>
           <th>CPF</th>
-          <th>Início</th>
-          <th>Fim</th>
-          <th>Motivo</th>
           <th>Local</th>
+          <th>Início</th>
+          <th>Redução</th>
+          <th>Término</th>
           <th>Ações</th>
         </tr>
       </thead>
-      <tbody id="tabela"></tbody>
+      <tbody></tbody>
     </table>
   </div>
 
   <script>
-    let avisoEdicao = -1;
+    let editIndex = null;
 
-    function registrarAviso() {
-      const nome = document.getElementById('nome').value;
-      const cpf = document.getElementById('cpf').value;
-      const inicio = document.getElementById('inicio').value;
-      let fim = document.getElementById('fim').value;
-      const motivo = document.getElementById('motivo').value;
-      const local = document.getElementById('local').value;
-
-      if (!nome || !cpf || !inicio || !fim || !motivo || !local) return alert('Preencha todos os campos');
-
-      const fimDate = new Date(fim);
-      fimDate.setDate(fimDate.getDate() - 7);
-      fim = fimDate.toISOString().split('T')[0];
-
-      const novoAviso = { nome, cpf, inicio, fim, motivo, local };
-      const avisos = JSON.parse(localStorage.getItem('avisos')) || [];
-
-      if (avisoEdicao > -1) {
-        avisos[avisoEdicao] = novoAviso;
-        avisoEdicao = -1;
-      } else {
-        avisos.push(novoAviso);
-      }
-
-      localStorage.setItem('avisos', JSON.stringify(avisos));
-      limparCampos();
-      listarAvisos();
-    }
-
-    function listarAvisos() {
-      const avisos = JSON.parse(localStorage.getItem('avisos')) || [];
-      const ordenar = document.getElementById('ordenar').value;
-
-      if (ordenar === 'nome') {
-        avisos.sort((a, b) => a.nome.localeCompare(b.nome));
-      } else {
-        avisos.sort((a, b) => new Date(b.inicio) - new Date(a.inicio));
-      }
-
-      const tabela = document.getElementById('tabela');
-      tabela.innerHTML = '';
-
+    function carregarAvisos() {
+      const tbody = document.querySelector('#tabelaAviso tbody');
+      tbody.innerHTML = '';
+      const avisos = JSON.parse(localStorage.getItem('avisoPrevio') || '[]');
       avisos.forEach((aviso, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${aviso.nome}</td>
           <td>${aviso.cpf}</td>
-          <td>${aviso.inicio}</td>
-          <td>${aviso.fim}</td>
-          <td>${aviso.motivo}</td>
           <td>${aviso.local}</td>
-          <td class="actions">
-            <button onclick="editarAviso(${index})">Editar</button>
-            <button onclick="excluirAviso(${index})">Excluir</button>
+          <td>${aviso.dataInicio}</td>
+          <td>${aviso.reducao ? 'Sim' : 'Não'}</td>
+          <td>${aviso.dataTermino}</td>
+          <td>
+            <button class="btn" onclick="editar(${index})">Editar</button>
+            <button class="btn" onclick="excluir(${index})">Excluir</button>
           </td>
         `;
-        tabela.appendChild(tr);
+        tbody.appendChild(tr);
       });
     }
 
-    function editarAviso(index) {
-      const aviso = JSON.parse(localStorage.getItem('avisos'))[index];
-      document.getElementById('nome').value = aviso.nome;
-      document.getElementById('cpf').value = aviso.cpf;
-      document.getElementById('inicio').value = aviso.inicio;
-      document.getElementById('fim').value = aviso.fim;
-      document.getElementById('motivo').value = aviso.motivo;
-      document.getElementById('local').value = aviso.local;
-      avisoEdicao = index;
-    }
+    function registrarAviso() {
+      const nome = document.getElementById('nome').value;
+      const cpf = document.getElementById('cpf').value;
+      const local = document.getElementById('local').value;
+      const dataInicio = document.getElementById('dataInicio').value;
+      const reducao = document.getElementById('reducao').checked;
+      const dataTermino = document.getElementById('dataTermino').value;
 
-    function excluirAviso(index) {
-      const avisos = JSON.parse(localStorage.getItem('avisos')) || [];
-      avisos.splice(index, 1);
-      localStorage.setItem('avisos', JSON.stringify(avisos));
-      listarAvisos();
-    }
+      if (!nome || !cpf || !local || !dataInicio || !dataTermino) {
+        alert("Preencha todos os campos.");
+        return;
+      }
 
-    function limparCampos() {
+      const novoAviso = { nome, cpf, local, dataInicio, reducao, dataTermino };
+      let avisos = JSON.parse(localStorage.getItem('avisoPrevio') || '[]');
+
+      if (editIndex !== null) {
+        avisos[editIndex] = novoAviso;
+        editIndex = null;
+      } else {
+        avisos.push(novoAviso);
+      }
+
+      localStorage.setItem('avisoPrevio', JSON.stringify(avisos));
       document.getElementById('nome').value = '';
       document.getElementById('cpf').value = '';
-      document.getElementById('inicio').value = '';
-      document.getElementById('fim').value = '';
-      document.getElementById('motivo').value = '';
       document.getElementById('local').value = '';
+      document.getElementById('dataInicio').value = '';
+      document.getElementById('reducao').checked = false;
+      document.getElementById('dataTermino').value = '';
+      carregarAvisos();
     }
 
-    window.onload = listarAvisos;
+    function editar(index) {
+      const aviso = JSON.parse(localStorage.getItem('avisoPrevio'))[index];
+      document.getElementById('nome').value = aviso.nome;
+      document.getElementById('cpf').value = aviso.cpf;
+      document.getElementById('local').value = aviso.local;
+      document.getElementById('dataInicio').value = aviso.dataInicio;
+      document.getElementById('reducao').checked = aviso.reducao;
+      document.getElementById('dataTermino').value = aviso.dataTermino;
+      editIndex = index;
+    }
+
+    function excluir(index) {
+      const avisos = JSON.parse(localStorage.getItem('avisoPrevio') || '[]');
+      avisos.splice(index, 1);
+      localStorage.setItem('avisoPrevio', JSON.stringify(avisos));
+      carregarAvisos();
+    }
+
+    window.onload = carregarAvisos;
   </script>
 </body>
 </html>
